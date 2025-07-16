@@ -30,3 +30,11 @@ vim.cmd('hi IlluminatedWordWrite guibg=none gui=underline')
 require('nvim-highlight-colors').setup({
   enable_named_colors = false,
 })
+require("luasnip.loaders.from_lua").lazy_load({ paths = "~/.config/nvim/lua/Snippets/" })
+vim.opt.number = true           -- Enable absolute line numbers
+vim.opt.relativenumber = true  -- Disable relative numbering
+vim.o.guicursor = "n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50" -- Set cursor shape
+-- In your init.lua (or equivalent)
+
+
+

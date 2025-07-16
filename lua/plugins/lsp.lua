@@ -44,8 +44,6 @@ return {
     require("mason").setup({})
     require("mason-lspconfig").setup({
       ensure_installed = {
-        "tsserver",
-        "eslint",
         "rust_analyzer",
         "kotlin_language_server",
         "jdtls",
@@ -78,6 +76,7 @@ return {
     local cmp_select = { behavior = cmp.SelectBehavior.Select }
 
     require("luasnip.loaders.from_vscode").lazy_load()
+
 
     -- `/` cmdline setup.
     cmp.setup.cmdline("/", {

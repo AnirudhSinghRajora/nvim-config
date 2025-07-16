@@ -211,11 +211,6 @@ return {
       local lint = require("lint")
 
       lint.linters_by_ft = {
-        javascript = { "eslint_d" },
-        typescript = { "eslint_d" },
-        javascriptreact = { "eslint_d" },
-        typescriptreact = { "eslint_d" },
-        svelte = { "eslint_d" },
         kotlin = { "ktlint" },
         terraform = { "tflint" },
       }
@@ -259,7 +254,6 @@ return {
           html = { "htmlbeautifier" },
           bash = { "beautysh" },
           proto = { "buf" },
-          rust = { "rustfmt" },
           yaml = { "yamlfix" },
           toml = { "taplo" },
           css = { { "prettierd", "prettier", stop_after_first = true } },
@@ -744,12 +738,10 @@ return {
           "prettier",
           "prettierd",
           "ktlint",
-          "eslint_d",
           "google-java-format",
           "htmlbeautifier",
           "beautysh",
           "buf",
-          "rustfmt",
           "yamlfix",
           "taplo",
           "shellcheck",
@@ -783,3 +775,4 @@ return {
     },
   },
 }
+

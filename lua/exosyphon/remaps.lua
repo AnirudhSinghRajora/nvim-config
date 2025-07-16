@@ -144,6 +144,9 @@ vim.keymap.set("v", "//", 'y/<C-R>"<CR>', { desc = "Search for highlighted text"
 
 -- Exit terminal mode shortcut
 vim.keymap.set("t", "<C-t>", "<C-\\><C-n>")
+-- remap.lua
+vim.api.nvim_set_keymap('n', '<C-b>', ':QuickRun -input input.txt<CR>', { noremap = true, silent = false })
+vim.api.nvim_set_keymap('n', '<C-i>', ':vsplit input.txt<CR>', { noremap = true, silent = false })
 
 -- Autocommands
 vim.api.nvim_create_augroup("custom_buffer", { clear = true })
