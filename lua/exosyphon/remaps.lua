@@ -28,6 +28,8 @@ vim.keymap.set("v", "p", '"_dP')
 vim.keymap.set("n", "<leader>y", "\"+y", { desc = "Yank into \" register" })
 vim.keymap.set("v", "<leader>y", "\"+y", { desc = "Yank into \" register" })
 vim.keymap.set("n", "<leader>Y", "\"+Y", { desc = "Yank into \" register" })
+vim.keymap.set("n", "<leader>p", "\"+p", { desc = "Paste from system clipboard" })
+vim.keymap.set("v", "<leader>p", "\"+p", { desc = "Paste from system clipboard" })
 
 -- Delete text to " register
 vim.keymap.set("n", "<leader>d", "\"_d", { desc = "Delete into \" register" })
@@ -135,17 +137,31 @@ vim.keymap.set("v", ">", ">gv")
 vim.keymap.set({"n", "o", "x"}, "<s-h>", "^", { desc = "Jump to beginning of line" })
 vim.keymap.set({"n", "o", "x"}, "<s-l>", "g_", { desc = "Jump to end of line" })
 
--- Move block
+-- Move block (J/K in visual, Alt+Up/Down in normal+visual — VSCode style)
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move Block Down" })
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move Block Up" })
+vim.keymap.set("n", "<A-Down>", "<cmd>m .+1<CR>==", { desc = "Move Line Down" })
+vim.keymap.set("n", "<A-Up>", "<cmd>m .-2<CR>==", { desc = "Move Line Up" })
+vim.keymap.set("v", "<A-Down>", ":m '>+1<CR>gv=gv", { desc = "Move Block Down" })
+vim.keymap.set("v", "<A-Up>", ":m '<-2<CR>gv=gv", { desc = "Move Block Up" })
+vim.keymap.set("i", "<A-Down>", "<Esc><cmd>m .+1<CR>==gi", { desc = "Move Line Down (insert)" })
+vim.keymap.set("i", "<A-Up>", "<Esc><cmd>m .-2<CR>==gi", { desc = "Move Line Up (insert)" })
+
+-- Duplicate line/selection (Alt+Shift+Up/Down — VSCode style)
+vim.keymap.set("n", "<A-S-Down>", "<cmd>t .<CR>", { desc = "Duplicate Line Down" })
+vim.keymap.set("n", "<A-S-Up>", "<cmd>t .-1<CR>", { desc = "Duplicate Line Up" })
+vim.keymap.set("v", "<A-S-Down>", ":t '><CR>gv", { desc = "Duplicate Selection Down" })
+vim.keymap.set("v", "<A-S-Up>", ":t '<-1<CR>gv", { desc = "Duplicate Selection Up" })
+vim.keymap.set("i", "<A-S-Down>", "<Esc><cmd>t .<CR>gi", { desc = "Duplicate Line Down (insert)" })
+vim.keymap.set("i", "<A-S-Up>", "<Esc><cmd>t .-1<CR>gi", { desc = "Duplicate Line Up (insert)" })
 
 -- Search for highlighted text in buffer
 vim.keymap.set("v", "//", 'y/<C-R>"<CR>', { desc = "Search for highlighted text" })
 
 -- Exit terminal mode shortcut
 vim.keymap.set("t", "<C-t>", "<C-\\><C-n>")
--- remap.lua
-vim.api.nvim_set_keymap('n', '<C-b>', ':QuickRun -input input.txt<CR>', { noremap = true, silent = false })
+-- Neo-tree toggle
+vim.keymap.set('n', '<C-b>', '<cmd>Neotree toggle<CR>', { desc = "Toggle Neo-tree" })
 vim.api.nvim_set_keymap('n', '<C-i>', ':vsplit input.txt<CR>', { noremap = true, silent = false })
 
 -- Autocommands

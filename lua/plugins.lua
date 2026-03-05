@@ -1,5 +1,12 @@
 return {
   {
+    "lukas-reineke/indent-blankline.nvim",
+    main = "ibl",
+    ---@module "ibl"
+    ---@type ibl.config
+    opts = {},
+  },
+  {
     'MeanderingProgrammer/render-markdown.nvim',
     opts = {},
     dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' },
@@ -710,7 +717,19 @@ return {
       })
     end,
   },
-  "mg979/vim-visual-multi",
+  {
+    "mg979/vim-visual-multi",
+    init = function()
+      -- Disable default mouse mappings so they don't interfere
+      vim.g.VM_mouse_mappings = 0
+      -- Set Alt+Click to add cursor at position (like VSCode)
+      vim.g.VM_maps = {
+        ["Add Cursor At Pos"] = "<M-LeftMouse>",
+      }
+      -- Ensure the mouse click first positions the cursor, then adds VM cursor
+      vim.keymap.set("n", "<M-LeftMouse>", "<LeftMouse><Plug>(VM-Add-Cursor-At-Pos)", { desc = "VM: Add Cursor At Click" })
+    end,
+  },
   "tpope/vim-rails",
   {
     "williamboman/mason.nvim",
@@ -774,5 +793,18 @@ return {
       "tpope/vim-rhubarb",
     },
   },
+  {
+    'akinsho/bufferline.nvim',
+    dependencies = 'kyazdani42/nvim-web-devicons',
+    --[[ tag = "v3.*", ]]
+    config = function()
+    local status_ok, bufferline = pcall(require, "bufferline")
+    if not status_ok then
+      return
+      end
+      vim.opt.termguicolors = true
+      bufferline.setup {}
+      end
+  }
 }
 
