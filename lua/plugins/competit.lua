@@ -100,6 +100,12 @@ return {
         return
       end
 
+      -- LeetCode submit not supported
+      if url:match("leetcode%.com") then
+        vim.notify("LeetCode submit is not supported yet", vim.log.levels.WARN)
+        return
+      end
+
       -- Get problem name from filename
       local problem_name = vim.fn.expand("%:t:r")
 
@@ -107,8 +113,8 @@ return {
       local all_lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
       local source_code = table.concat(all_lines, "\n")
 
-      -- Language ID 54 = GNU G++17 7.3.0 on Codeforces
-      local language_id = 54
+      -- Language ID 91 = GNU G++23 14.2 (64 bit, msys2) on Codeforces
+      local language_id = 91
 
       -- JSON payload for cph-submit
       local payload = vim.fn.json_encode({
@@ -185,6 +191,117 @@ except OSError:
       vim.notify("Submitting... cph-submit will pick it up in ~3s", vim.log.levels.INFO)
     end, { desc = "CTest: Submit via cph-submit" })
 
+
+    -- LeetCode problem receiver
+    -- Bypasses competitest (which crashes on LeetCode payloads due to missing languages.java fields)
+    -- Uses vim.uv TCP server to receive, creates file with parsedCode, saves testcases in competitest format
+    local function handle_leetcode_problem(task)
+      local cwd = vim.fn.getcwd()
+      local problem_name = task.name or "unknown"
+      local url = task.url or ""
+      local parsed_code = task.parsedCode or ""
+      local tests = task.tests or {}
+
+      -- Create directory: CWD/LeetCode/
+      local dir = cwd .. "/LeetCode"
+      vim.fn.mkdir(dir, "p")
+
+      -- File path
+      local filepath = dir .. "/" .. problem_name .. ".cpp"
+
+      -- File content: URL comment + parsedCode
+      local content = "// URL: " .. url .. "\n" .. parsed_code
+
+      -- Write file
+      local f = io.open(filepath, "w")
+      if not f then
+        vim.notify("Failed to create file: " .. filepath, vim.log.levels.ERROR)
+        return
+      end
+      f:write(content)
+      f:close()
+
+      -- Save test cases in competitest format (compitest/tc/ relative to source file dir)
+      local tc_dir = dir .. "/compitest/tc"
+      vim.fn.mkdir(tc_dir, "p")
+      for i, test in ipairs(tests) do
+        local input_path = tc_dir .. "/" .. problem_name .. "_input" .. (i - 1) .. ".txt"
+        local output_path = tc_dir .. "/" .. problem_name .. "_output" .. (i - 1) .. ".txt"
+        local inf = io.open(input_path, "w")
+        if inf then inf:write(test.input or ""); inf:close() end
+        local outf = io.open(output_path, "w")
+        if outf then outf:write(test.output or ""); outf:close() end
+      end
+
+      -- Open the file in Neovim
+      vim.cmd("edit " .. vim.fn.fnameescape(filepath))
+      vim.notify("LeetCode: " .. problem_name .. " received! (" .. #tests .. " test cases)", vim.log.levels.INFO)
+    end
+
+    vim.keymap.set("n", "<leader>ll", function()
+      local uv = vim.uv or vim.loop
+      local server = uv.new_tcp()
+
+      local ok = pcall(function() server:bind("127.0.0.1", 27121) end)
+      if not ok then
+        vim.notify("Port 27121 busy — stop CompetiTest listen first", vim.log.levels.ERROR)
+        return
+      end
+
+      server:listen(1, function(listen_err)
+        if listen_err then
+          vim.schedule(function()
+            vim.notify("LeetCode listen error: " .. tostring(listen_err), vim.log.levels.ERROR)
+          end)
+          return
+        end
+
+        local client = uv.new_tcp()
+        server:accept(client)
+
+        local raw = ""
+        client:read_start(function(_, chunk)
+          if chunk then
+            raw = raw .. chunk
+            -- Check if we have the full HTTP request (headers + body)
+            local header_end = raw:find("\r\n\r\n")
+            if header_end then
+              local headers = raw:sub(1, header_end - 1)
+              local body = raw:sub(header_end + 4)
+              local content_length = tonumber(headers:match("[Cc]ontent%-[Ll]ength:%s*(%d+)"))
+
+              if content_length and #body >= content_length then
+                client:read_stop()
+
+                -- Send HTTP 200 response
+                local resp = "HTTP/1.1 200 OK\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
+                client:write(resp, function()
+                  if not client:is_closing() then client:close() end
+                end)
+                if not server:is_closing() then server:close() end
+
+                -- Process the LeetCode problem
+                local json_str = body:sub(1, content_length)
+                vim.schedule(function()
+                  local decode_ok, task = pcall(vim.fn.json_decode, json_str)
+                  if decode_ok and task then
+                    handle_leetcode_problem(task)
+                  else
+                    vim.notify("Failed to parse LeetCode payload", vim.log.levels.ERROR)
+                  end
+                end)
+              end
+            end
+          else
+            -- Connection closed
+            if not client:is_closing() then client:close() end
+            if not server:is_closing() then server:close() end
+          end
+        end)
+      end)
+
+      vim.notify("Listening for LeetCode problem on port 27121...", vim.log.levels.INFO)
+    end, { desc = "LeetCode: Listen for Problem" })
 
     -- When a new cpp file is opened from a template, place cursor inside while loop
     vim.api.nvim_create_autocmd("BufReadPost", {
