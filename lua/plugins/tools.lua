@@ -1,3 +1,44 @@
+local function toggle_floaterm(name, wintype, position, size_key, size_val, create_cmd)
+  local ok, bufnr = pcall(vim.fn["floaterm#terminal#get_bufnr"], name)
+  if ok and bufnr and bufnr ~= -1 then
+    pcall(function()
+      vim.b[bufnr].floaterm_wintype = wintype
+      vim.b[bufnr].floaterm_position = position
+      vim.b[bufnr][size_key] = size_val
+    end)
+    local is_visible = (vim.fn.bufwinnr(bufnr) ~= -1)
+    if is_visible then
+      vim.cmd("FloatermHide " .. name)
+    else
+      vim.cmd("FloatermShow " .. name)
+    end
+  else
+    vim.cmd(create_cmd)
+  end
+end
+
+local toggle_vterm = function()
+  toggle_floaterm(
+    "vterm",
+    "vsplit",
+    "right",
+    "floaterm_width",
+    0.35,
+    "FloatermNew --wintype=vsplit --position=right --width=0.35 --name=vterm"
+  )
+end
+
+local toggle_hterm = function()
+  toggle_floaterm(
+    "hterm",
+    "split",
+    "bottom",
+    "floaterm_height",
+    0.35,
+    "FloatermNew --wintype=split --position=bottom --height=0.35 --name=hterm"
+  )
+end
+
 return {
   -- Harpoon file navigation (supports both Harpoon 1 and Harpoon 2 gracefully)
   {
@@ -79,20 +120,35 @@ return {
     end,
   },
 
-  -- Floating terminal
+  -- Floating & Split Terminal
   {
     "voldikss/vim-floaterm",
-    cmd = { "FloatermNew", "FloatermToggle", "FloatermPrev", "FloatermNext" },
-    config = function()
-      vim.keymap.set(
-        "n",
+    cmd = { "FloatermNew", "FloatermToggle", "FloatermPrev", "FloatermNext", "FloatermUpdate", "FloatermHide", "FloatermShow" },
+    keys = {
+      {
         "<leader>ft",
-        "<cmd>:FloatermNew --height=0.7 --width=0.8 --wintype=float --name=floaterm1 --position=center --autoclose=2<CR>",
-        { desc = "Open FloatTerm" }
-      )
-      vim.keymap.set("n", "<leader>flt", "<cmd>:FloatermToggle<CR>", { desc = "Toggle FloatTerm" })
-      vim.keymap.set("t", "<leader>flt", "<cmd>:FloatermToggle<CR>", { desc = "Toggle FloatTerm" })
-    end,
+        "<cmd>FloatermNew --height=0.7 --width=0.8 --wintype=float --name=floaterm1 --position=center --autoclose=2<CR>",
+        desc = "Open Floating Terminal",
+      },
+      { "<leader>flt", "<cmd>FloatermToggle<CR>", desc = "Toggle Floating Terminal" },
+      { "<leader>flt", "<cmd>FloatermToggle<CR>", mode = "t", desc = "Toggle Floating Terminal" },
+      { "<leader>fn", "<cmd>FloatermNext<CR>", desc = "Next Terminal" },
+      { "<leader>fn", "<cmd>FloatermNext<CR>", mode = "t", desc = "Next Terminal" },
+      { "<M-n>", "<cmd>FloatermNext<CR>", desc = "Next Terminal" },
+      { "<M-n>", "<C-\\><C-n><cmd>FloatermNext<CR>", mode = "t", desc = "Next Terminal" },
+      { "<leader>fp", "<cmd>FloatermPrev<CR>", desc = "Prev Terminal" },
+      { "<leader>fp", "<cmd>FloatermPrev<CR>", mode = "t", desc = "Prev Terminal" },
+      { "<M-p>", "<cmd>FloatermPrev<CR>", desc = "Prev Terminal" },
+      { "<M-p>", "<C-\\><C-n><cmd>FloatermPrev<CR>", mode = "t", desc = "Prev Terminal" },
+      { "<leader>fv", toggle_vterm, desc = "Toggle Right Vertical Terminal (35%)" },
+      { "<leader>fv", toggle_vterm, mode = "t", desc = "Toggle Right Vertical Terminal (35%)" },
+      { "<leader>tv", toggle_vterm, desc = "Toggle Right Vertical Terminal (35%)" },
+      { "<leader>tv", toggle_vterm, mode = "t", desc = "Toggle Right Vertical Terminal (35%)" },
+      { "<leader>fh", toggle_hterm, desc = "Toggle Bottom Horizontal Terminal (VSCode style)" },
+      { "<leader>fh", toggle_hterm, mode = "t", desc = "Toggle Bottom Horizontal Terminal (VSCode style)" },
+      { "<leader>th", toggle_hterm, desc = "Toggle Bottom Horizontal Terminal (VSCode style)" },
+      { "<leader>th", toggle_hterm, mode = "t", desc = "Toggle Bottom Horizontal Terminal (VSCode style)" },
+    },
   },
 
   -- Clipboard & macro manager via Telescope (moved to <leader>fy to avoid conflict with Obsidian <leader>o)

@@ -309,12 +309,18 @@ This cheatsheet is the complete, definitive reference for every keybinding, navi
 | `<C-Left>` | Resize vertical split narrower (-2) |
 | `<C-Right>` | Resize vertical split wider (+2) |
 
-### Floating Terminal (`floaterm`)
-| Key | Description |
-| :--- | :--- |
-| `<leader>ft` | Open centered floating terminal |
-| `<leader>flt` | Toggle floating terminal visibility (Normal and Terminal modes) |
-| `<C-t>` | Terminal mode: Exit terminal input back to Normal mode |
+### Terminal Operations (`floaterm`)
+| Key | Mode | Description |
+| :--- | :--- | :--- |
+| `<leader>ft` | Normal | Open centered floating terminal (70% height, 80% width) |
+| `<leader>flt` | Normal, Terminal | Toggle centered floating terminal visibility |
+| `<leader>fv` / `<leader>tv` | Normal, Terminal | **Toggle 35% right-hand vertical split terminal** (`vterm`) |
+| `<leader>fh` / `<leader>th` | Normal, Terminal | **Toggle 35% bottom horizontal split terminal (VSCode style)** (`hterm`) |
+| `<leader>fn` / `<M-n>` | Normal, Terminal | **Cycle to next terminal** in the queue |
+| `<leader>fp` / `<M-p>` | Normal, Terminal | **Cycle to previous terminal** in the queue |
+| `<C-t>` | Terminal | Exit terminal input mode back to Normal mode |
+| `:FloatermNew` | Command | Create a new terminal in the queue |
+| `:FloatermKill` | Command | Kill active terminal |
 
 ---
 
