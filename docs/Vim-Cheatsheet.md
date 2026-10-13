@@ -1,123 +1,353 @@
 # Neovim Comprehensive Keybindings & Cheatsheet
 
-This cheatsheet covers all navigation motions, editing operations, register manipulations, and plugin workflows configured in this Neovim environment.
+This cheatsheet is the complete, definitive reference for every keybinding, navigation motion, text object, operator, register workflow, and plugin keymap available in this Neovim environment.
 
 ---
 
-## 1. Essential Basics & Window Management
+## Quick Navigation Index
 
-### Modes & Exit
-| Key | Mode | Description |
-| :--- | :--- | :--- |
-| `jj` | Insert | Quick escape from Insert mode back to Normal mode |
-| `Q` | Normal | Disabled (prevents accidental Ex-mode entry) |
-| `<C-t>` | Terminal | Exit terminal mode back to normal terminal buffer navigation |
-
-### Buffer & Window Management
-| Key | Description |
-| :--- | :--- |
-| `<leader>q` | Close current buffer (`:bd`) |
-| `<leader>w` | Close current buffer while **preserving split layout** (`:bp\|bd #`) |
-| `<C-h>` | Navigate to window / tmux pane on the left |
-| `<C-j>` | Navigate to window / tmux pane below |
-| `<C-k>` | Navigate to window / tmux pane above |
-| `<C-l>` | Navigate to window / tmux pane on the right |
-| `<C-S-Down>` | Resize horizontal split taller |
-| `<C-S-Up>` | Resize horizontal split shorter |
-| `<C-Left>` | Resize vertical split narrower |
-| `<C-Right>` | Resize vertical split wider |
-
-### Terminal
-| Key | Description |
-| :--- | :--- |
-| `<leader>ft` | Open centered floating terminal (Floaterm) |
-| `<leader>flt` | Toggle floating terminal visibility (works in Normal and Terminal modes) |
+1. [Core Vim Foundations](#1-core-vim-foundations)
+   - [Basic & Word Motions](#basic--word-motions)
+   - [Line & Viewport Motions](#line--viewport-motions)
+   - [Core Operators](#core-operators)
+   - [Standard Text Objects](#standard-text-objects)
+   - [Marks & Jump List](#marks--jump-list)
+   - [Macros & Registers](#macros--registers)
+   - [Command-Line & File Operations](#command-line--file-operations)
+2. [Commenting & Annotations](#2-commenting--annotations)
+3. [Surround, Multi-Cursor & Text Manipulation](#3-surround-multi-cursor--text-manipulation)
+4. [Treesitter Text Objects & Selection](#4-treesitter-text-objects--selection)
+5. [Code Folding & Focus Modes](#5-code-folding--focus-modes)
+6. [Window, Buffer, Tab & Terminal Management](#6-window-buffer-tab--terminal-management)
+7. [File Explorers](#7-file-explorers)
+8. [Fast Navigation & Harpoon](#8-fast-navigation--harpoon)
+9. [Telescope Fuzzy Finder](#9-telescope-fuzzy-finder)
+10. [Autocompletion & Snippets](#10-autocompletion--snippets)
+11. [LSP (Language Server Protocol)](#11-lsp-language-server-protocol)
+12. [Formatting & Linting](#12-formatting--linting)
+13. [Git Workflows](#13-git-workflows)
+14. [Competitive Programming & QuickRun](#14-competitive-programming--quickrun)
+15. [Debugging (DAP)](#15-debugging-dap)
+16. [Test Runner (Neotest)](#16-test-runner-neotest)
+17. [Obsidian & Markdown](#17-obsidian--markdown)
+18. [Quickfix & Location Lists](#18-quickfix--location-lists)
 
 ---
 
-## 2. Navigation, Motions & Centering
+## 1. Core Vim Foundations
 
-### Line & Buffer Navigation
+### Basic & Word Motions
 | Key | Mode | Description |
 | :--- | :--- | :--- |
-| `<s-h>` | `n`, `v`, `o` | Jump to first non-blank character of line (`^`) |
-| `<s-l>` | `n`, `v`, `o` | Jump to last character of line (`g_`) |
-| `<C-d>` | Normal | Half-page down and center cursor (`zz`) |
-| `<C-u>` | Normal | Half-page up and center cursor (`zz`) |
-| `n` | Normal | Next search result (centered `zzzv`) |
-| `N` | Normal | Previous search result (centered `zzzv`) |
-| `J` | Normal | Join line below while preserving cursor position |
+| `h` / `j` / `k` / `l` | Normal, Visual | Move left / down / up / right by one character |
+| `w` | Normal, Visual | Jump forward to start of next word |
+| `W` | Normal, Visual | Jump forward to start of next WORD (space-delimited) |
+| `b` | Normal, Visual | Jump backward to start of previous word |
+| `B` | Normal, Visual | Jump backward to start of previous WORD (space-delimited) |
+| `e` | Normal, Visual | Jump forward to end of current/next word |
+| `E` | Normal, Visual | Jump forward to end of current/next WORD |
+| `ge` | Normal, Visual | Jump backward to end of previous word |
+| `f{char}` | Normal, Visual | Jump forward onto next occurrence of `{char}` on current line |
+| `F{char}` | Normal, Visual | Jump backward onto previous occurrence of `{char}` on current line |
+| `t{char}` | Normal, Visual | Jump forward till before next occurrence of `{char}` |
+| `T{char}` | Normal, Visual | Jump backward till after previous occurrence of `{char}` |
+| `;` | Normal, Visual | Repeat last `f`, `F`, `t`, or `T` motion forward |
+| `,` | Normal, Visual | Repeat last `f`, `F`, `t`, or `T` motion backward |
+| `%` | Normal, Visual | Jump to matching bracket, parenthesis, or curly brace |
+| `*` | Normal | Search forward for word currently under cursor |
+| `#` | Normal | Search backward for word currently under cursor |
+
+### Line & Viewport Motions
+| Key | Mode | Description |
+| :--- | :--- | :--- |
+| `0` | Normal, Visual | Jump to absolute beginning of current line (column 0) |
+| `^` / `<s-h>` | Normal, Visual | Jump to first non-blank character of current line |
+| `$` / `<s-l>` | Normal, Visual | Jump to end of current line |
+| `g_` | Normal, Visual | Jump to last non-blank character of line |
+| `gg` | Normal, Visual | Jump to first line of buffer |
+| `G` | Normal, Visual | Jump to last line of buffer |
+| `{number}G` / `:{number}<CR>` | Normal | Jump directly to line `{number}` |
+| `<C-d>` | Normal | Scroll half-page down and center viewport (`zz`) |
+| `<C-u>` | Normal | Scroll half-page up and center viewport (`zz`) |
+| `<C-f>` | Normal | Scroll full-page down |
+| `<C-b>` | Normal | Scroll full-page up |
+| `<C-e>` | Normal | Scroll viewport down one line (cursor stays) |
+| `<C-y>` | Normal | Scroll viewport up one line (cursor stays) |
+| `zz` | Normal | Center current line in viewport |
+| `zt` | Normal | Scroll viewport so current line is at the top |
+| `zb` | Normal | Scroll viewport so current line is at the bottom |
+| `H` | Normal | Move cursor to top (High) line on screen |
+| `M` | Normal | Move cursor to middle (Middle) line on screen |
+| `L` | Normal | Move cursor to bottom (Low) line on screen |
+| `n` | Normal | Jump to next search match and center cursor (`nzzzv`) |
+| `N` | Normal | Jump to previous search match and center cursor (`Nzzzv`) |
+| `J` | Normal | Join line below while preserving cursor position (`mzJ`z`) |
 | `==` | Normal | Select entire buffer (`gg<S-v>G`) |
 
-### Flash Fast Motions
+### Core Operators
+*Combine operators with motions or text objects (e.g., `dw` = delete word, `ci"` = change inside quotes, `yap` = yank paragraph).*
+
 | Key | Mode | Description |
 | :--- | :--- | :--- |
-| `s` | Normal, Visual, Operator | Flash 2-character jump anywhere on screen |
-| `S` | Normal | Flash Treesitter node jump |
-| `r` | Operator | Remote Flash operation (e.g., `yr` to yank a remote word) |
-| `R` | Operator, Visual | Treesitter search |
+| `d` | Normal | Delete (cut) operator |
+| `c` | Normal | Change operator (deletes text and enters Insert mode) |
+| `y` | Normal | Yank (copy) operator |
+| `Y` | Normal | Yank to end of line (`y$`) |
+| `x` | Normal | Delete character under cursor |
+| `s` | Normal | Delete character under cursor and enter Insert mode |
+| `r{char}` | Normal | Replace single character under cursor with `{char}` |
+| `R` | Normal | Enter Replace mode (overwrite text) |
+| `u` | Normal | Undo last change |
+| `<C-r>` | Normal | Redo last undone change |
+| `.` | Normal | Repeat last edit command |
+| `~` | Normal, Visual | Switch case of character under cursor |
+| `gU{motion}` | Normal | Make text uppercase across motion |
+| `gu{motion}` | Normal | Make text lowercase across motion |
+| `>` / `<` | Visual | Indent / unindent lines (preserves visual selection mode) |
+| `jj` | Insert | Fast escape back to Normal mode |
+| `Q` | Normal | Disabled (prevents accidental Ex-mode entry) |
 
-### File Explorers
-| Key | Description |
+### Standard Text Objects
+*Used after operators like `d`, `c`, `y`, `v` (e.g., `diw` = delete inner word, `ca(` = change around parentheses).*
+
+| Text Object | Description |
 | :--- | :--- |
-| `-` | Open parent directory in floating buffer (**Oil**) |
-| `<C-b>` | Toggle file tree sidebar (**Neo-tree**) |
+| `iw` / `aw` | Inner / around word |
+| `iW` / `aW` | Inner / around WORD (separated only by whitespace) |
+| `is` / `as` | Inner / around sentence |
+| `ip` / `ap` | Inner / around paragraph |
+| `i"` / `a"` | Inner / around double quotes (`"..."`) |
+| `i'` / `a'` | Inner / around single quotes (`'...'`) |
+| `i\`` / `a\`` | Inner / around backticks (`` `...` ``) |
+| `i(` / `a(` or `ib` / `ab` | Inner / around parentheses (`(...)`) |
+| `i[` / `a[` | Inner / around square brackets (`[...]`) |
+| `i{` / `a{` or `iB` / `aB` | Inner / around curly braces (`{...}`) |
+| `i<` / `a<` | Inner / around angle brackets (`<...>`) |
+| `it` / `at` | Inner / around HTML/XML tag block (`<div>...</div>`) |
+
+### Marks & Jump List
+| Key | Mode | Description |
+| :--- | :--- | :--- |
+| `m{a-z}` | Normal | Set buffer-local mark at cursor position |
+| `m{A-Z}` | Normal | Set global project mark across all files |
+| `'{mark}` | Normal | Jump to beginning of line containing `{mark}` |
+| ``{mark}` | Normal | Jump to exact line and column containing `{mark}` |
+| `''` / ` `` ` | Normal | Jump back to position before previous jump |
+| `<C-o>` | Normal | Navigate backward in jump list |
+| `<C-i>` | Normal | Navigate forward in jump list (jump list restored) |
+| `:jumps` | Normal | View full history of cursor jump locations |
+| `:marks` | Normal | View all active marks |
+
+### Macros & Registers
+| Key | Mode | Description |
+| :--- | :--- | :--- |
+| `q{a-z}` | Normal | Start recording macro into register `{a-z}` |
+| `q` | Normal | Stop macro recording |
+| `@{a-z}` | Normal | Execute macro stored in register `{a-z}` |
+| `@@` | Normal | Replay most recently executed macro |
+| `"{reg}y` | Normal, Visual | Yank into specific register `{reg}` |
+| `"{reg}p` | Normal, Visual | Paste from specific register `{reg}` |
+| `"+` | Normal, Visual | System clipboard register (`<leader>y`, `<leader>p`) |
+| `"_` | Normal, Visual | Black hole register (`<leader>d` deletes without touching clipboard) |
+| `"0` | Normal | Yank register (stores last explicit yank, untouched by `x` or `d`) |
+| `:reg` | Normal | View contents of all Neovim registers |
+
+### Command-Line & File Operations
+| Command | Description |
+| :--- | :--- |
+| `:w` / `:w!` | Save current buffer / force save |
+| `:q` / `:q!` | Quit window / quit without saving changes |
+| `:wq` / `:x` / `ZZ` | Save and quit window |
+| `:wa` / `:qa` | Save all modified buffers / quit all windows |
+| `:%s/old/new/g` | Search and replace `old` with `new` across entire buffer |
+| `:%s/old/new/gc` | Search and replace with confirmation prompt for each occurrence |
+| `<leader>s` | Interactive search & replace for word currently under cursor |
+| `//` | Visual | Search buffer for visually highlighted text |
+| `:noh` | Normal | Clear active search highlighting |
+| `<leader>x` | Normal | Make current file executable (`chmod +x %`) |
+| `<leader><leader>` | Normal | Re-source active Lua configuration file (`:so`) |
+| `<leader>cf` | Normal | Copy relative file path to system clipboard |
+| `<leader>cp` | Normal | Copy absolute file path to system clipboard |
 
 ---
 
-## 3. Editing, Selection & Clipboard
+## 2. Commenting & Annotations
 
-### System Clipboard & Registers
+*Powered by `Comment.nvim` and native Neovim commenting engine.*
+
+### Line Comments (`//`, `#`, `--`)
 | Key | Mode | Description |
 | :--- | :--- | :--- |
-| `<leader>y` | `n`, `v` | Yank selection to system clipboard (`"+y`) |
-| `<leader>Y` | Normal | Yank whole line to system clipboard (`"+Y`) |
-| `<leader>p` | `n`, `v` | Paste from system clipboard (`"+p`) |
-| `<leader>d` | `n`, `v` | Blackhole delete (does not overwrite default register) |
-| `p` | Visual | Paste over selection **without** clobbering paste register (`"_dP`) |
-| `Y` | Normal | Yank to end of line (consistent with `D` and `C`) |
+| `gcc` | Normal | Toggle comment on the current line |
+| `gc{motion}` | Normal | Toggle comment across motion (e.g., `gc4j` for 4 lines down, `gcap` for paragraph) |
+| `gc` | Visual | Toggle comment on selected lines |
+| `gcA` | Normal | Insert comment at the end of current line and enter Insert mode |
+| `gco` | Normal | Insert comment on new line below and enter Insert mode |
+| `gcO` | Normal | Insert comment on new line above and enter Insert mode |
+
+### Block Comments (`/* ... */`)
+| Key | Mode | Description |
+| :--- | :--- | :--- |
+| `gbc` | Normal | Toggle block comment on current line |
+| `gb{motion}` | Normal | Toggle block comment across motion |
+| `gb` | Visual | Toggle block comment on selected lines |
+
+### Todo Comments (`todo-comments.nvim`)
+| Key | Description |
+| :--- | :--- |
+| `]t` | Jump to next `TODO`, `FIXME`, `BUG`, `NOTE`, or `PERF` comment |
+| `[t` | Jump to previous `TODO`, `FIXME`, `BUG`, `NOTE`, or `PERF` comment |
+| `<leader>st` | Search all workspace `TODO` / `FIXME` comments via Telescope picker |
+
+---
+
+## 3. Surround, Multi-Cursor & Text Manipulation
+
+### Surround Operations (`nvim-surround`)
+| Key | Mode | Description | Example |
+| :--- | :--- | :--- | :--- |
+| `ys{motion}{char}` | Normal | Add surround `{char}` around `{motion}` | `ysiw"` &rarr; `word` becomes `"word"` |
+| `ds{char}` | Normal | Delete surround `{char}` | `ds"` &rarr; `"word"` becomes `word` |
+| `cs{target}{replacement}` | Normal | Change `{target}` surround to `{replacement}` | `cs"'` &rarr; `"word"` becomes `'word'` |
+| `S{char}` | Visual | Wrap visual selection with `{char}` | Highlight text, press `S]` &rarr; `[text]` |
+
+### Multi-Cursor Editing (`vim-visual-multi`)
+| Key | Mode | Description |
+| :--- | :--- | :--- |
+| `<C-n>` | Normal | Select word under cursor; press again to add next match |
+| `q` | VM mode | Skip current occurrence and jump to next match |
+| `[` / `]` | VM mode | Jump backward / forward between active cursors |
+| `\\c` | VM mode | Clear all multi-cursors and return to normal mode |
+| `<C-Down>` / `<C-Up>` | Normal | Add vertical cursor directly below / above |
 
 ### Moving & Duplicating Lines (VSCode Style)
 | Key | Mode | Description |
 | :--- | :--- | :--- |
-| `<A-Down>` | Normal, Visual, Insert | Move current line or block down |
-| `<A-Up>` | Normal, Visual, Insert | Move current line or block up |
+| `<A-Down>` | Normal, Visual, Insert | Move current line or selected block down |
+| `<A-Up>` | Normal, Visual, Insert | Move current line or selected block up |
 | `<A-S-Down>` | Normal, Visual, Insert | Duplicate current line or selection down |
 | `<A-S-Up>` | Normal, Visual, Insert | Duplicate current line or selection up |
-| `J` / `K` | Visual | Move selected block down / up |
-| `<` / `>` | Visual | Indent / unindent staying in visual selection mode |
+| `J` / `K` | Visual | Move selected block down / up preserving selection |
 
-### Search, Replace & Utility
+---
+
+## 4. Treesitter Text Objects & Selection
+
+### Incremental Syntax Selection
 | Key | Mode | Description |
 | :--- | :--- | :--- |
-| `<leader>s` | Normal | Interactive search & replace word under cursor across entire file |
-| `//` | Visual | Search buffer for visually highlighted text |
-| `<leader>x` | Normal | Make current file executable (`chmod +x %`) |
-| `<leader><leader>` | Normal | Re-source current Lua file (`:so`) |
-| `<leader>cf` | Normal | Copy relative file path to clipboard |
-| `<leader>cp` | Normal | Copy absolute file path to clipboard |
-| `<leader>nd` | Normal | Dismiss active Noice notifications |
+| `<C-space>` | Normal | Initialize syntax selection under cursor |
+| `<C-space>` | Visual | Increment selection to parent AST node |
+| `<C-CR>` | Visual | Increment selection to outer scope (function / class) |
+| `<bs>` | Visual | Decrement selection to child AST node |
+
+### Code Text Objects (`nvim-treesitter-textobjects`)
+| Key | Mode | Description |
+| :--- | :--- | :--- |
+| `af` / `if` | Operator, Visual | Around / inside function body |
+| `ac` / `ic` | Operator, Visual | Around / inside class / struct body |
+| `aa` / `ia` | Operator, Visual | Around / inside parameter or function argument |
+
+### Code Navigation by AST Nodes
+| Key | Description |
+| :--- | :--- |
+| `]m` / `[m` | Jump to next / previous function start |
+| `]M` / `[M` | Jump to next / previous function end |
+| `]]` / `[[` | Jump to next / previous class start |
+| `][` / `[]` | Jump to next / previous class end |
+| `<leader>sp` | Swap parameter under cursor with next parameter |
+| `<leader>sP` | Swap parameter under cursor with previous parameter |
 
 ---
 
-## 4. Quickfix & Location Lists
+## 5. Code Folding & Focus Modes
 
+### Modern Code Folding (`nvim-ufo`)
 | Key | Description |
 | :--- | :--- |
-| `]q` | Next quickfix item (centered `zz`) |
-| `[q` | Previous quickfix item (centered `zz`) |
-| `]l` | Next location list item (centered `zz`) |
-| `[l` | Previous location list item (centered `zz`) |
-| `:copen` / `:cclose` | Open / close quickfix list window |
-| `:lopen` / `:lclose` | Open / close location list window |
+| `zR` | Open all folds across current buffer |
+| `zM` | Close all folds across current buffer |
+| `zr` | Open fold level one step |
+| `zm` | Close fold level one step |
+| `za` | Toggle fold under cursor |
+| `zo` / `zc` | Open / close fold under cursor |
+| `K` | Hover: If cursor is on a closed fold, peeks fold preview in floating window |
+
+### Focus & Zen Modes
+| Key | Description |
+| :--- | :--- |
+| `<leader>z` | Toggle Zen Mode (centered distraction-free buffer view) |
+| `<leader>tw` | Toggle Twilight (dims all code paragraphs outside cursor scope) |
 
 ---
 
-## 5. Harpoon 2 Navigation
+## 6. Window, Buffer, Tab & Terminal Management
+
+### Bufferline Tabs (`bufferline.nvim`)
+| Key | Description |
+| :--- | :--- |
+| `<leader>bn` | Switch to next open buffer tab |
+| `<leader>bp` | Switch to previous open buffer tab |
+| `<leader>bc` | Close active buffer tab (`:bd`) |
+| `<leader>bco` | Close all other buffers except current |
+| `<leader>1` - `<leader>9` | Jump directly to buffer tab number 1 through 9 |
+
+### Window Splits & Navigation
+| Key | Description |
+| :--- | :--- |
+| `<C-h>` | Navigate to window / tmux pane on the left |
+| `<C-j>` | Navigate to window / tmux pane below |
+| `<C-k>` | Navigate to window / tmux pane above |
+| `<C-l>` | Navigate to window / tmux pane on the right |
+| `<leader>q` | Close current window buffer (`:bd`) |
+| `<leader>w` | Close current buffer while **preserving split layout** (`:bp\|bd #`) |
+| `<C-S-Down>` | Resize horizontal split taller (+2) |
+| `<C-S-Up>` | Resize horizontal split shorter (-2) |
+| `<C-Left>` | Resize vertical split narrower (-2) |
+| `<C-Right>` | Resize vertical split wider (+2) |
+
+### Floating Terminal (`floaterm`)
+| Key | Description |
+| :--- | :--- |
+| `<leader>ft` | Open centered floating terminal |
+| `<leader>flt` | Toggle floating terminal visibility (Normal and Terminal modes) |
+| `<C-t>` | Terminal mode: Exit terminal input back to Normal mode |
+
+---
+
+## 7. File Explorers
 
 | Key | Description |
 | :--- | :--- |
-| `<leader>a` | Add current file to Harpoon |
+| `-` | Open parent directory in floating buffer (**Oil.nvim**) |
+| `<C-b>` | Toggle file tree sidebar (**Neo-tree**) |
+
+### Inside Oil File Manager
+| Key | Action |
+| :--- | :--- |
+| `<CR>` | Open file or directory |
+| `<C-v>` | Open file in vertical split |
+| `<C-s>` | Open file in horizontal split |
+| `<C-p>` | Preview file in floating window |
+| `_` | Open current working directory |
+| `g.` | Toggle hidden files visibility |
+
+---
+
+## 8. Fast Navigation & Harpoon
+
+### Flash Screen Motions (`flash.nvim`)
+| Key | Mode | Description |
+| :--- | :--- | :--- |
+| `s` | Normal, Visual, Op | Type 2 characters to jump anywhere on screen instantly |
+| `S` | Normal | Flash Treesitter node jump |
+| `r` | Operator | Remote flash operation (e.g., `yr` to yank a word across the screen) |
+| `R` | Operator, Visual | Treesitter AST search |
+
+### Harpoon File Pinning
+| Key | Description |
+| :--- | :--- |
+| `<leader>a` | Add / pin current file to Harpoon list |
 | `<C-e>` | Toggle Harpoon quick menu window |
 | `<C-t>` | Jump directly to Harpoon slot 1 |
 | `<C-s>` | Jump directly to Harpoon slot 2 |
@@ -126,62 +356,81 @@ This cheatsheet covers all navigation motions, editing operations, register mani
 
 ---
 
-## 6. Telescope Fuzzy Finder
+## 9. Telescope Fuzzy Finder
 
+### Search Pickers
 | Key | Description |
 | :--- | :--- |
-| `<leader>ff` | Find files (including hidden, excluding `.git`) |
-| `<leader>fg` | Live grep with optional arguments (`--iglob`, etc.) |
-| `<leader>fc` | Live grep code only (excluding tests and specs) |
-| `<leader>fb` | Find open buffers |
+| `<leader>ff` | Find files (includes hidden, ignores `.git`) |
+| `<leader>fg` | Live grep workspace with ripgrep |
+| `<leader>fc` | Live grep code only (excludes tests, specs, fixtures) |
+| `<leader>fb` | Find currently open buffers |
 | `<leader>fo` | Find recent / old files |
-| `<leader>fh` | Find help tags |
-| `<leader>fs` | LSP document symbols |
-| `<leader>fw` | Find word under cursor across workspace |
-| `<leader>fk` | Find registered keymaps |
+| `<leader>fh` | Search Neovim help documentation |
+| `<leader>fs` | Search LSP document symbols in current buffer |
+| `<leader>fw` | Find word currently under cursor across workspace |
+| `<leader>fk` | Search all registered keymaps |
 | `<leader>/` | Fuzzy find in current buffer (dropdown theme) |
 | `<leader>gc` | Search git commits |
 | `<leader>gb` | Search git commits for current buffer |
-| `<leader>fi` | Advanced Git Search |
-| `<leader>uc` / `<leader>uC` | Preview and select colorschemes |
-| `<leader>uu` | Telescope undo tree history |
+| `<leader>fi` | Advanced Git search |
+| `<leader>uc` / `<leader>uC` | Interactive colorscheme selector |
+| `<leader>uu` | Telescope undo tree history picker |
 | `<leader>uU` / `<leader>U` | Undotree toggle window |
-| `<leader>fy` | Neoclip (clipboard & macro history) |
+| `<leader>fy` | Neoclip (clipboard & yank history) |
 | `<leader>Z` | Zoxide interactive directory jumping |
 
-### Inside Telescope Picker
+### Inside Telescope Picker Window
 | Key | Mode | Action |
 | :--- | :--- | :--- |
-| `<CR>` | Insert | Open single selected file (or multiple if tagged) |
-| `<C-j>` / `<C-k>` | Insert | History next / previous |
-| `<C-w>` | Insert | Send selected items to quickfix list and open |
+| `<CR>` | Insert | Open single selected file (or all tagged files) |
+| `<C-j>` / `<C-k>` | Insert | History next / previous query |
+| `<C-w>` | Insert | Send selected results to Quickfix list and open |
 | `<C-S-d>` | Insert | Delete selected buffer from list |
 | `<C-s>` / `<C-a>` | Insert | Cycle through previewers |
+| `<Esc>` / `<C-c>` | Insert | Close Telescope picker |
 
 ---
 
-## 7. LSP (Language Server Protocol)
+## 10. Autocompletion & Snippets
+
+*Powered by `nvim-cmp` and `LuaSnip`.*
+
+| Key | Mode | Description |
+| :--- | :--- | :--- |
+| `<C-Space>` | Insert | Manually trigger autocomplete suggestions menu |
+| `<C-n>` | Insert | Next suggestion in completion menu |
+| `<C-p>` | Insert | Previous suggestion in completion menu |
+| `<C-y>` | Insert | Confirm and accept selected suggestion |
+| `<C-e>` | Insert | Abort / dismiss completion menu |
+| `<C-b>` / `<C-f>` | Insert | Scroll documentation float window up / down |
+| `<Tab>` | Insert | Jump forward to next snippet placeholder (e.g. in CP template) |
+| `<S-Tab>` | Insert | Jump backward to previous snippet placeholder |
+
+---
+
+## 11. LSP (Language Server Protocol)
 
 | Key | Mode | Description |
 | :--- | :--- | :--- |
 | `gd` | Normal | Go to definition |
-| `gr` | Normal | Go to references |
+| `gr` | Normal | Find all references |
 | `gI` | Normal | Go to implementation |
-| `K` | Normal | Hover documentation window |
-| `<C-h>` | Insert | Signature help popup |
-| `<leader>rn` | Normal | Rename symbol across workspace |
-| `<leader>ca` | `n`, `v` | Code actions |
+| `K` | Normal | Show hover documentation popup |
+| `<C-h>` | Insert | Show signature help popup |
+| `<leader>rn` | Normal | Rename symbol workspace-wide |
+| `<leader>ca` | Normal, Visual | Show LSP code actions |
 | `<leader>ws` | Normal | Search workspace symbols |
-| `<leader>d` | Normal | Show diagnostic details float for current line |
-| `[d` | Normal | Jump to previous diagnostic |
-| `]d` | Normal | Jump to next diagnostic |
-| `<leader>vrr` | Normal | *(Legacy alias)* References |
-| `<leader>vrn` | Normal | *(Legacy alias)* Rename symbol |
-| `<leader>vca` | Normal | *(Legacy alias)* Code action |
+| `<leader>d` | Normal | Show line diagnostics float |
+| `[d` | Normal | Jump to previous diagnostic error/warning |
+| `]d` | Normal | Jump to next diagnostic error/warning |
+| `<leader>vrr` | Normal | *(Legacy)* References |
+| `<leader>vrn` | Normal | *(Legacy)* Rename symbol |
+| `<leader>vca` | Normal | *(Legacy)* Code action |
 
 ---
 
-## 8. Formatting & Linting
+## 12. Formatting & Linting
 
 | Key | Mode | Description |
 | :--- | :--- | :--- |
@@ -190,22 +439,22 @@ This cheatsheet covers all navigation motions, editing operations, register mani
 
 ---
 
-## 9. Git Workflows
+## 13. Git Workflows
 
 ### Git Signs & Hunks (`gitsigns.nvim`)
 | Key | Mode | Description |
 | :--- | :--- | :--- |
-| `]c` | Normal | Jump to next Git hunk |
-| `[c` | Normal | Jump to previous Git hunk |
-| `<leader>hs` | Normal, Visual | Stage hunk (or visual range) |
-| `<leader>hr` | Normal, Visual | Reset hunk (or visual range) |
+| `]c` | Normal | Jump to next Git diff hunk |
+| `[c` | Normal | Jump to previous Git diff hunk |
+| `<leader>hs` | Normal, Visual | Stage current hunk (or selected visual range) |
+| `<leader>hr` | Normal, Visual | Reset / discard current hunk |
 | `<leader>hS` | Normal | Stage entire buffer |
 | `<leader>hu` | Normal | Undo stage hunk |
 | `<leader>hR` | Normal | Reset entire buffer |
-| `<leader>hp` | Normal | Preview hunk diff in popup |
-| `<leader>hb` | Normal | Blame current line with full commit details |
-| `<leader>htb` | Normal | Toggle real-time virtual line blame |
-| `<leader>hd` | Normal | Diff current file against index |
+| `<leader>hp` | Normal | Preview hunk diff in floating popup |
+| `<leader>hb` | Normal | Blame current line with commit details |
+| `<leader>htb` | Normal | Toggle inline virtual blame line |
+| `<leader>hd` | Normal | Diff current file against git index |
 | `<leader>hD` | Normal | Diff current file against `HEAD~1` |
 | `<leader>htd` | Normal | Toggle inline deleted lines preview |
 | `ih` | Operator, Visual | Text object: select inside Git hunk |
@@ -213,36 +462,38 @@ This cheatsheet covers all navigation motions, editing operations, register mani
 ### Fugitive, Diffview & Octo
 | Key | Description |
 | :--- | :--- |
-| `<leader>gs` | Open Fugitive status panel (`:Git`) |
-| `<leader>O` | Open Octo dashboard |
-| `<leader>Op` | List GitHub Pull Requests via Octo |
-| `:DiffviewOpen` | Open file history / branch diff view |
+| `<leader>gs` | Open Fugitive Git status panel (`:Git`) |
+| `<leader>O` | Open Octo GitHub dashboard |
+| `<leader>Op` | List GitHub pull requests |
+| `:DiffviewOpen` | Open side-by-side branch / commit diff view |
+| `:DiffviewClose` | Close Diffview panels |
+| `:DiffviewFileHistory` | Open full file commit history panel |
 | `:Neogit` | Open interactive Magit-style Git interface |
 
 ---
 
-## 10. Competitive Programming & Testing
+## 14. Competitive Programming & QuickRun
 
 ### CompetiTest (`lua/plugins/competitive.lua`)
 | Key | Description |
 | :--- | :--- |
-| `<leader>cl` | Start listening for problems/contests via **Competitive Companion** (port 27121) |
-| `<leader>cr` | Save current file, compile, and run all test cases with diffs |
-| `<leader>cta` / `<leader>ca` | Add a new manual testcase |
+| `<leader>cl` | Start listening for problems from **Competitive Companion** browser extension (port 27121) |
+| `<leader>cr` | Save current solution, compile C++, and run testcases with diffs |
+| `<leader>cta` / `<leader>ca` | Add manual testcase input & expected output |
 | `<leader>cte` / `<leader>ce` | Edit existing testcase |
 | `<leader>ctd` / `<leader>cd` | Delete testcases |
-| `<leader>cs` | Auto-submit C++ solution to **Codeforces** via `cph-submit` extension |
-| `<leader>lc` | Start custom **LeetCode** listener on port 27121 |
+| `<leader>cs` | Auto-submit C++ solution to **Codeforces** via `cph-submit` |
+| `<leader>lc` | Start custom **LeetCode** problem listener on port 27121 |
 
-### QuickRun
+### QuickRun & Input
 | Key | Description |
 | :--- | :--- |
-| `<leader>r` | Run current file with `input.txt` redirected |
-| `<leader>ci` | Split open `input.txt` (`:vsplit input.txt`) |
+| `<leader>r` | Run active file redirected from `input.txt` |
+| `<leader>ci` | Split open `input.txt` vertically (`:vsplit input.txt`) |
 
 ---
 
-## 11. Debugging (DAP)
+## 15. Debugging (DAP)
 
 | Key | Description |
 | :--- | :--- |
@@ -252,42 +503,56 @@ This cheatsheet covers all navigation motions, editing operations, register mani
 | `<leader>dsu` | Step out |
 | `<leader>dst` | Terminate debugger session |
 | `<leader>b` | Toggle line breakpoint |
-| `<leader>B` | Set conditional breakpoint |
+| `<leader>B` | Set conditional breakpoint with expression |
 | `<leader>E` | Set exception breakpoint |
 | `<leader>do` | Toggle DAP UI layout |
-| `<leader>dr` | Open floating DAP REPL |
-| `<leader>ds` | Open floating Scopes inspector |
-| `<leader>df` | Open floating Stacks inspector |
-| `<leader>db` | Open floating Breakpoints list |
+| `<leader>dr` | Open floating DAP REPL console |
+| `<leader>dsc` / `<leader>ds` | Open floating Scopes inspector |
+| `<leader>df` | Open floating Call Stacks inspector |
+| `<leader>db` | Open floating Breakpoints manager |
 | `<leader>dl` | Re-run last debugging session |
 
 ---
 
-## 12. Test Runner (`neotest`)
+## 16. Test Runner (`neotest`)
 
 | Key | Description |
 | :--- | :--- |
-| `<leader>t` | Run nearest test |
+| `<leader>t` / `<leader>tr` | Run nearest test under cursor |
 | `<leader>tf` | Run entire test file |
 | `<leader>td` | Run tests in current working directory |
-| `<leader>tp` | Toggle test output panel |
-| `<leader>tl` | Re-run last test |
-| `<leader>ts` | Toggle test summary sidebar |
+| `<leader>tp` | Toggle floating test output panel |
+| `<leader>tl` | Re-run most recent test |
+| `<leader>ts` | Toggle test summary sidebar tree |
 
 ---
 
-## 13. Obsidian & Markdown
+## 17. Obsidian & Markdown
 
 | Key | Description |
 | :--- | :--- |
 | `<leader>on` | Create new Obsidian note |
-| `<leader>os` | Search Obsidian notes |
-| `<leader>oq` | Quick switch notes |
-| `<leader>oo` | Open current note in Obsidian desktop app |
+| `<leader>os` | Search Obsidian notes across vault |
+| `<leader>oq` | Quick switch between vault notes |
+| `<leader>oo` | Open active note inside Obsidian desktop application |
 | `<leader>ob` | Show backlinks for current note |
-| `<leader>ol` | Show links in current note |
+| `<leader>ol` | Show links inside current note |
 | `<leader>oc` | Toggle Markdown checkbox (`[ ]` <-> `[x]`) |
 | `<leader>ot` | Insert Obsidian template |
-| `gj` / `gk` | Jump to next / previous Markdown heading (scoped to `*.md`) |
+| `gj` / `gk` | Jump to next / previous Markdown heading (`##`) |
 | `:MarkdownPreview` | Open live browser preview of Markdown |
 | `:MarkdownPreviewStop` | Stop live browser preview |
+
+---
+
+## 18. Quickfix & Location Lists
+
+| Key | Description |
+| :--- | :--- |
+| `]q` | Next quickfix error/item (centered `zz`) |
+| `[q` | Previous quickfix error/item (centered `zz`) |
+| `]l` | Next location list item (centered `zz`) |
+| `[l` | Previous location list item (centered `zz`) |
+| `:copen` / `:cclose` | Open / close quickfix list window |
+| `:lopen` / `:lclose` | Open / close location list window |
+| `:cfirst` / `:clast` | Jump to very first / very last quickfix item |
