@@ -66,6 +66,43 @@ return {
         evaluate_template_modifiers = true,
       })
 
+      -- Automatically focus cursor inside solve() when a new problem file is opened
+      vim.api.nvim_create_autocmd({ "BufReadPost", "BufEnter" }, {
+        group = vim.api.nvim_create_augroup("CompetiTestAutoSolve", { clear = true }),
+        pattern = "*.cpp",
+        callback = function(args)
+          -- Only target competitive files with "// URL:" in the first 3 lines
+          local header = vim.api.nvim_buf_get_lines(args.buf, 0, 3, false)
+          local is_cp = false
+          for _, line in ipairs(header) do
+            if line:match("^// URL:") then
+              is_cp = true
+              break
+            end
+          end
+
+          if not is_cp then
+            return
+          end
+
+          -- Check if solve() is empty (new problem file)
+          local lines = vim.api.nvim_buf_get_lines(args.buf, 0, -1, false)
+          for idx, line in ipairs(lines) do
+            if line:match("^void%s+solve%s*%(%s*%)%s*{") then
+              if idx < #lines and lines[idx + 1]:match("^%s*$") then
+                vim.schedule(function()
+                  if vim.api.nvim_buf_is_valid(args.buf) and vim.api.nvim_get_current_buf() == args.buf then
+                    vim.api.nvim_win_set_cursor(0, { idx + 1, 4 })
+                    vim.cmd("startinsert!")
+                  end
+                end)
+                break
+              end
+            end
+          end
+        end,
+      })
+
       -- Keymaps
       vim.keymap.set("n", "<leader>cl", "<cmd>CompetiTest receive contest<CR>", { desc = "CTest: Listen for Problems" })
       vim.keymap.set("n", "<leader>cr", "<cmd>w | CompetiTest run<CR>", { desc = "CTest: Save & Run All Testcases" })
