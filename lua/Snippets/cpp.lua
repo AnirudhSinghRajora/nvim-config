@@ -22,8 +22,8 @@ template<class T> using ordered_multiset =tree<T, null_type, less_equal<T>, rb_t
 #define int long long int
 #define f(i,a,b) for(int i=a;i<b;i++)
 #define crm ios::sync_with_stdio(false),cin.tie(NULL);
-#define in(v) for (auto &i : v) cin >> i;
-#define out(v) for (auto i : v) cout << i << ' ';
+#define in(v) for (auto &_x : v) cin >> _x;
+#define out(v) for (auto _y : v) cout << _y << ' ';
 #define all(x) x.begin(),x.end()
 #define rall(x) x.rbegin(),x.rend()
 #define endl "\n" 
@@ -33,6 +33,8 @@ template<class T> using ordered_multiset =tree<T, null_type, less_equal<T>, rb_t
 #define bcnt(x) __builtin_popcountll(x) // -> Number of set bits int
 #define bctz(x) __builtin_ctzll(x) // -> Count trailing zeros in binary
 #define bclz(x) __builtin_clzll(x) // -> Count leading zeros in binary
+template<class T> bool smin(T &a, const T b) {{ return b < a ? a = b, 1 : 0;}}
+template<class T> bool smax(T &a, const T b) {{ return a < b ? a = b, 1 : 0;}}
 
 /*
 
@@ -49,13 +51,16 @@ Institute:    IIIT Lucknow
 
 */
 
+void solve(){{
+    {}
+}}
 
 int32_t main(){{
     crm
     int _ = 1;
     cin >> _;
     while(_--){{
-        {}
+        solve();
     }}
     return 0;
 }}

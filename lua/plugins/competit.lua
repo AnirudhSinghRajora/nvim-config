@@ -38,11 +38,14 @@ return {
       compile_command = {
         cpp = {
           exec = "sh",
-          args = { "-c", "mkdir -p compitest/bins && g++ -std=c++17 -O2 -Wall -Wextra -DLOCAL '$(FNAME)' -o 'compitest/bins/$(FNOEXT)'" },
+          args = { "-c", 'mkdir -p compitest/bins && g++ -std=c++17 -O2 -Wall -Wextra -DLOCAL "$(FNAME)" -o "compitest/bins/$(FNOEXT)"' },
         },
       },
       run_command = {
-        cpp = { exec = "compitest/bins/$(FNOEXT)" },
+        cpp = {
+          exec = "sh",
+          args = { "-c", '"compitest/bins/$(FNOEXT)"' },
+        },
       },
 
       -- Run all testcases at once; 5 second timeout
@@ -105,6 +108,10 @@ return {
         vim.notify("LeetCode submit is not supported yet", vim.log.levels.WARN)
         return
       end
+
+      -- Convert /problemset/problem/X/Y to /contest/X/problem/Y
+      -- cph-submit only recognizes the contest URL format
+      url = url:gsub("codeforces%.com/problemset/problem/(%d+)/(%w+)", "codeforces.com/contest/%1/problem/%2")
 
       -- Get problem name from filename
       local problem_name = vim.fn.expand("%:t:r")
@@ -182,8 +189,8 @@ except OSError:
 ]])
       sf:close()
 
-      -- Launch fully detached from Neovim (nohup + & + redirects)
-      -- This ensures the server isn't tied to Neovim's I/O at all
+
+      -- Kill only our specific python submit servers (not Neovim), then launch detached
       os.execute(string.format(
         "nohup python3 '%s' '%s' '%s' >/dev/null 2>&1 &",
         script_file, tmpfile, script_file
@@ -238,9 +245,16 @@ except OSError:
       vim.notify("LeetCode: " .. problem_name .. " received! (" .. #tests .. " test cases)", vim.log.levels.INFO)
     end
 
-    vim.keymap.set("n", "<leader>ll", function()
+    vim.keymap.set("n", "<leader>lc", function()
+      -- Free port from CompetiTest first
+      pcall(function() vim.cmd("CompetiTest receive stop") end)
+
       local uv = vim.uv or vim.loop
-      local server = uv.new_tcp()
+      if _G.lc_server and not _G.lc_server:is_closing() then
+        _G.lc_server:close()
+      end
+      _G.lc_server = uv.new_tcp()
+      local server = _G.lc_server
 
       local ok = pcall(function() server:bind("127.0.0.1", 27121) end)
       if not ok then
