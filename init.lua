@@ -1,40 +1,45 @@
+-- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
-  vim.fn.system({
+local uv = vim.uv or vim.loop
+if not uv.fs_stat(lazypath) then
+  local out = vim.fn.system({
     "git",
     "clone",
     "--filter=blob:none",
     "https://github.com/folke/lazy.nvim.git",
-    "--branch=stable", -- latest stable release
+    "--branch=stable",
     lazypath,
   })
+  if vim.v.shell_error ~= 0 then
+    vim.api.nvim_echo({
+      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
+      { out, "WarningMsg" },
+      { "\nPress any key to exit..." },
+    }, true, {})
+    vim.fn.getchar()
+    os.exit(1)
+  end
 end
 vim.opt.rtp:prepend(lazypath)
 
+-- Leader keys (must be defined before plugins or keymaps are loaded)
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+-- Core configuration (globals, options, and compat shims must load BEFORE plugins)
+require("core.globals")
+require("core.options")
+require("core.treesitter_compat")
+
+-- Load plugins (scans lua/plugins/ directory)
 require("lazy").setup("plugins", {
   change_detection = {
     notify = false,
   },
+  ui = {
+    border = "rounded",
+  },
 })
 
-require('exosyphon.globals')
-require('exosyphon.remaps')
-require('exosyphon.options')
-vim.cmd("colorscheme tokyonight")
-vim.cmd('hi IlluminatedWordText guibg=none gui=underline')
-vim.cmd('hi IlluminatedWordRead guibg=none gui=underline')
-vim.cmd('hi IlluminatedWordWrite guibg=none gui=underline')
-require('nvim-highlight-colors').setup({
-  enable_named_colors = false,
-})
-require("luasnip.loaders.from_lua").lazy_load({ paths = "~/.config/nvim/lua/Snippets/" })
-vim.opt.number = true           -- Enable absolute line numbers
-vim.opt.relativenumber = true  -- Disable relative numbering
-vim.o.guicursor = "n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50" -- Set cursor shape
--- In your init.lua (or equivalent)
-
-
-
+-- Load editor-native keymaps (after plugins so which-key and bindings hook cleanly)
+require("core.keymaps")
