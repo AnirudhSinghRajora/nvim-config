@@ -130,6 +130,10 @@ return {
           filter = { event = "msg_show", find = "vim.tbl_islist is deprecated" },
           opts = { skip = true },
         },
+        {
+          filter = { event = "msg_show", find = "quit with exit code" },
+          opts = { skip = true },
+        },
       },
       presets = {
         lsp_doc_border = true,
@@ -137,7 +141,13 @@ return {
     },
     dependencies = {
       "MunifTanjim/nui.nvim",
-      "rcarriga/nvim-notify",
+      {
+        "rcarriga/nvim-notify",
+        opts = {
+          timeout = 3000,
+          stages = "fade",
+        },
+      },
     },
   },
 

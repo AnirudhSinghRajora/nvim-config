@@ -148,8 +148,12 @@ vim.keymap.set("n", "<leader>cp", "<cmd>let @+ = expand('%:p')<CR>", { desc = "C
 -- Source current file
 vim.keymap.set("n", "<leader><leader>", "<cmd>so<CR>", { desc = "Source current file" })
 
--- Dismiss Noice Message
-vim.keymap.set("n", "<leader>nd", "<cmd>Noice dismiss<CR>", { desc = "Dismiss Noice Messages" })
+-- Dismiss notifications & clear search highlights with Esc
+vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR><cmd>Noice dismiss<CR>", { desc = "Clear highlights & dismiss notifications" })
+
+-- Notification management
+vim.keymap.set("n", "<leader>nd", "<cmd>Noice dismiss<CR>", { desc = "Dismiss active notifications" })
+vim.keymap.set("n", "<leader>nh", "<cmd>Noice history<CR>", { desc = "Show notification history" })
 
 -- Open Zoxide directory jumper
 vim.keymap.set("n", "<leader>Z", "<cmd>Zi<CR>", { desc = "Open Zoxide Picker" })

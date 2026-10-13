@@ -163,6 +163,9 @@ This cheatsheet is the complete, definitive reference for every keybinding, navi
 | `:%s/old/new/gc` | Search and replace with confirmation prompt for each occurrence |
 | `<leader>s` | Interactive search & replace for word currently under cursor |
 | `//` | Visual | Search buffer for visually highlighted text |
+| `<Esc>` | Normal | **Clear search highlights & dismiss all active notifications/popups** |
+| `<leader>nd` | Normal | Dismiss active notifications |
+| `<leader>nh` | Normal | Show notification history |
 | `:noh` | Normal | Clear active search highlighting |
 | `<leader>x` | Normal | Make current file executable (`chmod +x %`) |
 | `<leader><leader>` | Normal | Re-source active Lua configuration file (`:so`) |

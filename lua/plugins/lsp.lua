@@ -231,6 +231,10 @@ return {
         ensure_installed = vim.tbl_keys(servers),
         handlers = {
           function(server_name)
+            -- Only setup servers explicitly declared in our configuration
+            if not servers[server_name] then
+              return
+            end
             local server_opts = servers[server_name] or {}
             server_opts.capabilities = vim.tbl_deep_extend("force", capabilities, server_opts.capabilities or {})
             lspconfig[server_name].setup(server_opts)
