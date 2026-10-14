@@ -1,9 +1,19 @@
 return {
   {
     "mfussenegger/nvim-dap",
+    lazy = true,
+    cmd = {
+      "DapContinue",
+      "DapStepOver",
+      "DapStepInto",
+      "DapStepOut",
+      "DapTerminate",
+      "DapToggleBreakpoint",
+    },
     dependencies = {
       {
         "rcarriga/nvim-dap-ui",
+        lazy = true,
         dependencies = { "nvim-neotest/nvim-nio" },
         config = function(_, opts)
           local dap = require("dap")
@@ -28,7 +38,7 @@ return {
       },
       {
         "jay-babu/mason-nvim-dap.nvim",
-        dependencies = "mason.nvim",
+        dependencies = "mason-org/mason.nvim",
         cmd = { "DapInstall", "DapUninstall" },
         opts = {
           automatic_installation = true,
