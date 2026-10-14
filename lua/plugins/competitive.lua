@@ -41,8 +41,8 @@ return {
         },
         run_command = {
           cpp = {
-            exec = "sh",
-            args = { "-c", '"compitest/bins/$(FNOEXT)"' },
+            exec = "./compitest/bins/$(FNOEXT)",
+            args = {},
           },
         },
 
@@ -61,7 +61,7 @@ return {
         },
 
         template_file = {
-          cpp = vim.fn.expand("~/.config/nvim/templates/cp.cpp"),
+          cpp = vim.fn.stdpath("config") .. "/templates/cp.cpp",
         },
         evaluate_template_modifiers = true,
       })
@@ -73,9 +73,9 @@ return {
           return
         end
 
-        -- Ensure user snippets from lua/Snippets/ are loaded
+        -- Synchronously load user snippets from lua/Snippets/ so first-run expansion never races
         pcall(function()
-          require("luasnip.loaders.from_lua").lazy_load({
+          require("luasnip.loaders.from_lua").load({
             paths = { vim.fn.stdpath("config") .. "/lua/Snippets/" },
           })
         end)
@@ -104,13 +104,13 @@ return {
         -- Expand snippet
         ls.snip_expand(target_snip)
 
-        -- Position cursor at placeholder 1 (inside solve()) and enter Insert mode
+        -- Position cursor at placeholder 1 (inside solve()) and enter Insert mode cleanly
         local current_node = ls.session.current_nodes[buf]
         if current_node and current_node.mark then
           local pos = current_node.mark:pos_begin()
           vim.api.nvim_win_set_cursor(0, { pos[1] + 1, pos[2] })
         end
-        vim.cmd("startinsert!")
+        vim.cmd("startinsert")
       end
 
       vim.api.nvim_create_autocmd("BufWinEnter", {
@@ -143,14 +143,11 @@ return {
         end,
       })
 
-      -- Keymaps
+      -- Keymaps (using <leader>ct* for testcase management so <leader>ca and <leader>cd stay dedicated to LSP)
       vim.keymap.set("n", "<leader>cl", "<cmd>CompetiTest receive contest<CR>", { desc = "CTest: Listen for Problems" })
       vim.keymap.set("n", "<leader>cr", "<cmd>w | CompetiTest run<CR>", { desc = "CTest: Save & Run All Testcases" })
-      vim.keymap.set("n", "<leader>ca", "<cmd>CompetiTest add_testcase<CR>", { desc = "CTest: Add Testcase" })
       vim.keymap.set("n", "<leader>cta", "<cmd>CompetiTest add_testcase<CR>", { desc = "CTest: Add Testcase" })
-      vim.keymap.set("n", "<leader>ce", "<cmd>CompetiTest edit_testcase<CR>", { desc = "CTest: Edit Testcase" })
       vim.keymap.set("n", "<leader>cte", "<cmd>CompetiTest edit_testcase<CR>", { desc = "CTest: Edit Testcase" })
-      vim.keymap.set("n", "<leader>cd", "<cmd>CompetiTest delete_tcs<CR>", { desc = "CTest: Delete Testcases" })
       vim.keymap.set("n", "<leader>ctd", "<cmd>CompetiTest delete_tcs<CR>", { desc = "CTest: Delete Testcases" })
 
       -- Submit to Codeforces via cph-submit browser extension
@@ -180,7 +177,7 @@ return {
         local problem_name = vim.fn.expand("%:t:r")
         local all_lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
         local source_code = table.concat(all_lines, "\n")
-        local language_id = 91
+        local language_id = vim.g.cph_language_id or 91
 
         local payload = vim.fn.json_encode({
           empty = false,
@@ -199,8 +196,14 @@ return {
         f:write(payload)
         f:close()
 
-        local script_file = os.tmpname() .. ".py"
+        -- Use os.tmpname() directly without appending ".py" so no orphan file is leaked in /tmp
+        local script_file = os.tmpname()
         local sf = io.open(script_file, "w")
+        if not sf then
+          os.remove(tmpfile)
+          vim.notify("Failed to create temp script for submit server", vim.log.levels.ERROR)
+          return
+        end
         sf:write([[
 import http.server, json, sys, os, threading
 
@@ -245,10 +248,7 @@ except OSError:
 ]])
         sf:close()
 
-        os.execute(string.format(
-          "nohup python3 '%s' '%s' '%s' >/dev/null 2>&1 &",
-          script_file, tmpfile, script_file
-        ))
+        vim.fn.jobstart({ "python3", script_file, tmpfile, script_file }, { detach = true })
         vim.notify("Submitting... cph-submit will pick it up in ~3s", vim.log.levels.INFO)
       end, { desc = "CTest: Submit via cph-submit" })
 
@@ -304,7 +304,7 @@ except OSError:
           return
         end
 
-        server:listen(1, function(listen_err)
+        server:listen(16, function(listen_err)
           if listen_err then
             vim.schedule(function()
               vim.notify("LeetCode listen error: " .. tostring(listen_err), vim.log.levels.ERROR)
@@ -323,11 +323,35 @@ except OSError:
               if header_end then
                 local headers = raw:sub(1, header_end - 1)
                 local body = raw:sub(header_end + 4)
-                local content_length = tonumber(headers:match("[Cc]ontent%-[Ll]ength:%s*(%d+)"))
 
+                -- Respond to browser CORS preflight OPTIONS requests without closing server
+                if headers:match("^OPTIONS ") then
+                  client:read_stop()
+                  local cors_resp = table.concat({
+                    "HTTP/1.1 204 No Content",
+                    "Access-Control-Allow-Origin: *",
+                    "Access-Control-Allow-Methods: POST, GET, OPTIONS",
+                    "Access-Control-Allow-Headers: Content-Type",
+                    "Content-Length: 0",
+                    "Connection: close",
+                    "\r\n",
+                  }, "\r\n")
+                  client:write(cors_resp, function()
+                    if not client:is_closing() then client:close() end
+                  end)
+                  return
+                end
+
+                local content_length = tonumber(headers:match("[Cc]ontent%-[Ll]ength:%s*(%d+)"))
                 if content_length and #body >= content_length then
                   client:read_stop()
-                  local resp = "HTTP/1.1 200 OK\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
+                  local resp = table.concat({
+                    "HTTP/1.1 200 OK",
+                    "Access-Control-Allow-Origin: *",
+                    "Content-Length: 0",
+                    "Connection: close",
+                    "\r\n",
+                  }, "\r\n")
                   client:write(resp, function()
                     if not client:is_closing() then client:close() end
                   end)
@@ -346,31 +370,12 @@ except OSError:
               end
             else
               if not client:is_closing() then client:close() end
-              if not server:is_closing() then server:close() end
             end
           end)
         end)
 
         vim.notify("Listening for LeetCode problem on port 27121...", vim.log.levels.INFO)
       end, { desc = "LeetCode: Listen for Problem" })
-
-      -- Template cursor positioning
-      vim.api.nvim_create_autocmd("BufReadPost", {
-        pattern = "*.cpp",
-        callback = function()
-          if not vim.bo.modified then
-            local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-            for i, line in ipairs(lines) do
-              if line:match("while%(_%-%-%){") then
-                vim.api.nvim_win_set_cursor(0, { i + 1, 8 })
-                vim.cmd("startinsert")
-                return
-              end
-            end
-          end
-        end,
-        once = true,
-      })
     end,
   },
 }
