@@ -17,28 +17,28 @@ vim.opt.smartindent = true
 -- Search (ignorecase MUST be enabled for smartcase to take effect)
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
-vim.opt.hlsearch = false
+vim.opt.hlsearch = true
 vim.opt.incsearch = true
+vim.opt.inccommand = "split"
 
 -- Line wrapping
 vim.opt.wrap = false
 
--- Undo & swap (use standard Neovim state directory with automatic creation)
-local undodir = vim.fn.stdpath("state") .. "/undo"
-if vim.fn.isdirectory(undodir) == 0 then
-  vim.fn.mkdir(undodir, "p")
-end
-vim.opt.undodir = undodir
+-- Window splitting
+vim.opt.splitright = true
+vim.opt.splitbelow = true
+
+-- Undo & swap (Neovim automatically manages stdpath("state") .. "/undo")
 vim.opt.undofile = true
 vim.opt.swapfile = false
 vim.opt.backup = false
 
 -- Appearance
 vim.opt.termguicolors = true
-vim.opt.scrolloff = 20
+vim.opt.scrolloff = 8
 vim.opt.signcolumn = "yes"
 vim.opt.conceallevel = 2
 
 -- Misc
 vim.opt.isfname:append("@-@")
-vim.opt.updatetime = 50
+vim.opt.updatetime = 200

@@ -5,7 +5,8 @@
 -- (arrays of nodes) to support quantified captures.
 -- Plugins expecting legacy single TSNode captures fail when calling node:range()
 -- or passing arrays to vim.treesitter.get_node_text / get_range.
--- This module unwraps arrays transparently without breaking native 0.12 behaviors.
+-- This module unwraps arrays transparently while remaining 100% compatible with
+-- LuaJIT 2.1 (Lua 5.1 pairs/ipairs/rawget) and respecting `opts.all = true`.
 
 local M = {}
 
@@ -14,6 +15,17 @@ local function unwrap_node(node)
     return node[1] or node[#node]
   end
   return node
+end
+
+local function normalize_match(match, opts)
+  if type(match) ~= "table" or (type(opts) == "table" and opts.all) then
+    return match
+  end
+  local safe_match = {}
+  for k, v in pairs(match) do
+    safe_match[k] = unwrap_node(v)
+  end
+  return safe_match
 end
 
 function M.setup()
@@ -51,17 +63,7 @@ function M.setup()
     if orig_add_directive then
       vim.treesitter.query.add_directive = function(name, handler, opts)
         local wrapped_handler = function(match, pattern, source, pred, metadata)
-          local safe_match = setmetatable({}, {
-            __index = function(_, k)
-              return unwrap_node(match[k])
-            end,
-            __newindex = function(_, k, v)
-              match[k] = v
-            end,
-            __pairs = function(_)
-              return pairs(match)
-            end,
-          })
+          local safe_match = normalize_match(match, opts)
           return handler(safe_match, pattern, source, pred, metadata)
         end
         return orig_add_directive(name, wrapped_handler, opts)
@@ -71,19 +73,9 @@ function M.setup()
     local orig_add_predicate = vim.treesitter.query.add_predicate
     if orig_add_predicate then
       vim.treesitter.query.add_predicate = function(name, handler, opts)
-        local wrapped_handler = function(match, pattern, source, pred)
-          local safe_match = setmetatable({}, {
-            __index = function(_, k)
-              return unwrap_node(match[k])
-            end,
-            __newindex = function(_, k, v)
-              match[k] = v
-            end,
-            __pairs = function(_)
-              return pairs(match)
-            end,
-          })
-          return handler(safe_match, pattern, source, pred)
+        local wrapped_handler = function(match, pattern, source, pred, metadata)
+          local safe_match = normalize_match(match, opts)
+          return handler(safe_match, pattern, source, pred, metadata)
         end
         return orig_add_predicate(name, wrapped_handler, opts)
       end

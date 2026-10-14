@@ -39,6 +39,20 @@ require("lazy").setup("plugins", {
   ui = {
     border = "rounded",
   },
+  performance = {
+    rtp = {
+      disabled_plugins = {
+        "gzip",
+        "matchit",
+        "matchparen",
+        "netrwPlugin",
+        "tarPlugin",
+        "tohtml",
+        "tutor",
+        "zipPlugin",
+      },
+    },
+  },
 })
 
 -- Load editor-native keymaps (after plugins so which-key and bindings hook cleanly)

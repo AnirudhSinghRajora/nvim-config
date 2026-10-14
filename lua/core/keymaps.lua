@@ -13,10 +13,7 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 -- Exit insert mode without hitting Esc
-vim.keymap.set("i", "jj", "<Esc><Esc>", { desc = "Quick Esc" })
-
--- Make Y behave consistently like C or D
-vim.keymap.set("n", "Y", "y$", { desc = "Yank to end of line" })
+vim.keymap.set("i", "jj", "<Esc>", { desc = "Quick Esc" })
 
 -- Select all buffer text
 vim.keymap.set("n", "==", "gg<S-v>G", { desc = "Select entire buffer" })
@@ -38,9 +35,9 @@ vim.keymap.set("n", "<leader>Y", '"+Y', { desc = "Yank line into system clipboar
 vim.keymap.set("n", "<leader>p", '"+p', { desc = "Paste from system clipboard" })
 vim.keymap.set("v", "<leader>p", '"+p', { desc = "Paste from system clipboard" })
 
--- Delete text into black hole register (doesn't overwrite clipboard)
-vim.keymap.set("n", "<leader>d", '"_d', { desc = "Delete into black hole register" })
-vim.keymap.set("v", "<leader>d", '"_d', { desc = "Delete into black hole register" })
+-- Delete text into black hole register (moved to <leader>D so <leader>d is purely DAP prefix)
+vim.keymap.set("n", "<leader>D", '"_d', { desc = "Delete into black hole register" })
+vim.keymap.set("v", "<leader>D", '"_d', { desc = "Delete into black hole register" })
 
 -- Disable accidental Ex-mode entry
 vim.keymap.set("n", "Q", "<nop>")
@@ -57,19 +54,28 @@ vim.keymap.set("n", "[q", "<cmd>cprev<CR>zz", { desc = "Prev quickfix item" })
 vim.keymap.set("n", "]l", "<cmd>lnext<CR>zz", { desc = "Next location list item" })
 vim.keymap.set("n", "[l", "<cmd>lprev<CR>zz", { desc = "Prev location list item" })
 
--- Replace word under cursor across entire buffer
+-- Replace word under cursor across entire buffer (moved to <leader>sr to avoid <leader>sp/<leader>sP stall)
 vim.keymap.set(
   "n",
-  "<leader>s",
+  "<leader>sr",
   [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]],
   { desc = "Replace word under cursor" }
 )
 
--- Make current file executable
-vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true, desc = "Make current file executable" })
+-- Make current file executable (in-process via libuv without spawning a shell)
+vim.keymap.set("n", "<leader>x", function()
+  local file = vim.api.nvim_buf_get_name(0)
+  if file ~= "" then
+    local uv = vim.uv or vim.loop
+    uv.fs_chmod(file, tonumber("755", 8))
+    vim.notify("Marked executable: " .. vim.fn.fnamemodify(file, ":t"), vim.log.levels.INFO)
+  end
+end, { desc = "Make current file executable" })
 
--- Jump to plugin configuration files
-vim.keymap.set("n", "<leader>vpp", "<cmd>e ~/.config/nvim/lua/plugins/<CR>", { desc = "Open plugins directory" })
+-- Jump to plugin configuration files (dynamic stdpath)
+vim.keymap.set("n", "<leader>vpp", function()
+  vim.cmd.edit(vim.fn.stdpath("config") .. "/lua/plugins")
+end, { desc = "Open plugins directory" })
 
 -- Test Runner (Neotest)
 vim.keymap.set("n", "<leader>tr", "<cmd>lua require('neotest').run.run()<CR>", { desc = "Run Nearest Test" })
@@ -212,7 +218,7 @@ vim.keymap.set("n", "<leader>ci", "<cmd>vsplit input.txt<CR>", { desc = "Open in
 -- Autocommands
 local custom_buffer = vim.api.nvim_create_augroup("custom_buffer", { clear = true })
 
--- Auto enter insert mode when opening a terminal
+-- Auto enter insert mode when opening an interactive terminal (skip background tool panels)
 vim.api.nvim_create_autocmd("TermOpen", {
   desc = "Auto enter insert mode when opening a terminal",
   group = custom_buffer,
@@ -220,7 +226,8 @@ vim.api.nvim_create_autocmd("TermOpen", {
   callback = function(event)
     vim.defer_fn(function()
       if vim.api.nvim_buf_is_valid(event.buf) and vim.bo[event.buf].buftype == "terminal" then
-        if vim.api.nvim_get_current_buf() == event.buf then
+        local ft = vim.bo[event.buf].filetype
+        if (ft == "" or ft == "floaterm") and vim.api.nvim_get_current_buf() == event.buf then
           vim.cmd("startinsert")
         end
       end
