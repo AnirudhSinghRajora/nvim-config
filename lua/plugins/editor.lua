@@ -1,5 +1,5 @@
 return {
-  -- Which-key helper
+  -- Which-key helper (v3 spec handled automatically via opts)
   {
     "folke/which-key.nvim",
     event = "VeryLazy",
@@ -13,40 +13,22 @@ return {
         { "<auto>", mode = "nxso" },
       },
       spec = {
-        { "<leader>f", group = "Find / Telescope" },
+        { "<leader>f", group = "Find / Telescope / Term" },
         { "<leader>g", group = "Git" },
         { "<leader>h", group = "Git Hunks" },
         { "<leader>c", group = "Code / Competitive" },
+        { "<leader>ct", group = "CompetiTest Testcases" },
         { "<leader>d", group = "Debug (DAP)" },
-        { "<leader>t", group = "Test (Neotest)" },
+        { "<leader>t", group = "Test (Neotest) / Term" },
         { "<leader>o", group = "Obsidian" },
+        { "<leader>O", group = "Octo (GitHub)" },
+        { "<leader>n", group = "Notifications (Noice)" },
         { "<leader>u", group = "UI / Undo / Colors" },
-        { "<leader>l", group = "Format / Lint" },
-        { "<leader>s", group = "Swap / Search" },
+        { "<leader>l", group = "Format / Lint / LeetCode" },
+        { "<leader>s", group = "Swap / Search & Replace" },
         { "<leader>v", group = "LSP Legacy / Config" },
       },
     },
-    config = function(_, opts)
-      local wk = require("which-key")
-      wk.setup(opts)
-      if wk.add then
-        wk.add(opts.spec or {})
-      elseif wk.register then
-        wk.register({
-          f = { name = "Find / Telescope" },
-          g = { name = "Git" },
-          h = { name = "Git Hunks" },
-          c = { name = "Code / Competitive" },
-          d = { name = "Debug (DAP)" },
-          t = { name = "Test (Neotest)" },
-          o = { name = "Obsidian" },
-          u = { name = "UI / Undo / Colors" },
-          l = { name = "Format / Lint" },
-          s = { name = "Swap / Search" },
-          v = { name = "LSP Legacy / Config" },
-        }, { prefix = "<leader>" })
-      end
-    end,
   },
 
   -- Oil (file manager like a buffer)
@@ -82,7 +64,7 @@ return {
     end,
   },
 
-  -- Neo-tree file explorer
+  -- Neo-tree file explorer (hijack_netrw_behavior disabled so Oil remains default explorer)
   {
     "nvim-neo-tree/neo-tree.nvim",
     branch = "v3.x",
@@ -96,6 +78,7 @@ return {
       require("neo-tree").setup({
         close_if_last_window = true,
         filesystem = {
+          hijack_netrw_behavior = "disabled",
           follow_current_file = {
             enabled = true,
             leave_dirs_open = true,

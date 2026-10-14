@@ -40,10 +40,11 @@ local toggle_hterm = function()
 end
 
 return {
-  -- Harpoon file navigation (supports both Harpoon 1 and Harpoon 2 gracefully)
+  -- Harpoon file navigation (supports both Harpoon 2 and Harpoon 1 gracefully)
   {
     "ThePrimeagen/harpoon",
     branch = "harpoon2",
+    event = "VeryLazy",
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {
       settings = {
@@ -56,14 +57,11 @@ return {
         return
       end
 
-      -- Call setup safely with a clean table (use dot notation to never pollute Harpoon 1 config)
-      pcall(function()
-        harpoon.setup(opts or {})
-      end)
-
-      -- Auto-detect Harpoon 2 vs Harpoon 1 API
+      -- Auto-detect Harpoon 2 vs Harpoon 1 API and use colon notation for Harpoon 2 setup
       if type(harpoon.list) == "function" then
-        -- Harpoon 2 API
+        -- Harpoon 2 API (MUST use colon notation so `self` is passed to Harpoon:setup)
+        harpoon:setup(opts or {})
+
         vim.keymap.set("n", "<leader>a", function()
           harpoon:list():add()
         end, { desc = "Harpoon: Add File" })
@@ -85,6 +83,9 @@ return {
         end, { desc = "Harpoon File 4" })
       else
         -- Harpoon 1 API fallback
+        pcall(function()
+          harpoon.setup(opts or {})
+        end)
         local mark_ok, mark = pcall(require, "harpoon.mark")
         local ui_ok, ui = pcall(require, "harpoon.ui")
         if mark_ok and ui_ok then
@@ -111,6 +112,7 @@ return {
   -- Seamless tmux navigation
   {
     "nathom/tmux.nvim",
+    event = "VeryLazy",
     config = function()
       local map = vim.keymap.set
       map("n", "<C-h>", function() require("tmux").move_left() end, { desc = "Navigate left window" })
@@ -120,7 +122,7 @@ return {
     end,
   },
 
-  -- Floating & Split Terminal
+  -- Floating & Split Terminal (<leader>fh retained for horizontal terminal per user preference)
   {
     "voldikss/vim-floaterm",
     cmd = { "FloatermNew", "FloatermToggle", "FloatermPrev", "FloatermNext", "FloatermUpdate", "FloatermHide", "FloatermShow" },
@@ -151,9 +153,13 @@ return {
     },
   },
 
-  -- Clipboard & macro manager via Telescope (moved to <leader>fy to avoid conflict with Obsidian <leader>o)
+  -- Clipboard & macro manager via Telescope (lazy-loaded on yank or <leader>fy)
   {
     "AckslD/nvim-neoclip.lua",
+    event = "TextYankPost",
+    keys = {
+      { "<leader>fy", "<cmd>Telescope neoclip<CR>", desc = "Find Yank History (Neoclip)" },
+    },
     dependencies = { "nvim-telescope/telescope.nvim" },
     config = function()
       require("neoclip").setup({
@@ -165,20 +171,21 @@ return {
         default_register_macros = "q",
         enable_macro_history = true,
       })
-      vim.keymap.set("n", "<leader>fy", "<cmd>Telescope neoclip<CR>", { desc = "Find Yank History (Neoclip)" })
     end,
   },
 
-  -- Luarocks & Image rendering
+  -- Luarocks & Image rendering (lazy-loaded on markdown/vimwiki files)
   {
     "vhyrro/luarocks.nvim",
-    priority = 1001,
+    lazy = true,
     opts = {
       rocks = { "magick" },
     },
   },
   {
     "3rd/image.nvim",
+    ft = { "markdown", "vimwiki" },
+    event = "VeryLazy",
     dependencies = { "vhyrro/luarocks.nvim" },
     config = function()
       require("image").setup({
@@ -204,6 +211,6 @@ return {
   },
 
   -- Project configuration & Rails
-  { "tpope/vim-projectionist" },
+  { "tpope/vim-projectionist", event = "VeryLazy" },
   { "tpope/vim-rails", ft = { "ruby", "eruby" } },
 }

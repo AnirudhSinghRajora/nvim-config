@@ -3,6 +3,7 @@ return {
   {
     "lukas-reineke/indent-blankline.nvim",
     main = "ibl",
+    event = { "BufReadPost", "BufNewFile" },
     opts = {
       exclude = {
         filetypes = {
@@ -23,6 +24,7 @@ return {
   -- Color highlighter
   {
     "brenoprata10/nvim-highlight-colors",
+    event = { "BufReadPost", "BufNewFile" },
     config = function()
       require("nvim-highlight-colors").setup({
         enable_named_colors = false,
@@ -33,6 +35,7 @@ return {
   -- Highlight word under cursor
   {
     "RRethy/vim-illuminate",
+    event = { "BufReadPost", "BufNewFile" },
     config = function()
       require("illuminate")
       vim.cmd("hi IlluminatedWordText guibg=none gui=underline")
@@ -154,6 +157,7 @@ return {
   -- Statusline
   {
     "nvim-lualine/lualine.nvim",
+    event = "VeryLazy",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
       require("lualine").setup({
@@ -180,18 +184,32 @@ return {
     end,
   },
 
-  -- Bufferline
+  -- Bufferline (with documented tab navigation keymaps)
   {
     "akinsho/bufferline.nvim",
+    event = "VeryLazy",
     dependencies = "nvim-tree/nvim-web-devicons",
     config = function()
       require("bufferline").setup({})
+      vim.keymap.set("n", "<leader>bn", "<cmd>BufferLineCycleNext<CR>", { desc = "Next Buffer Tab" })
+      vim.keymap.set("n", "<leader>bp", "<cmd>BufferLineCyclePrev<CR>", { desc = "Prev Buffer Tab" })
+      vim.keymap.set("n", "<leader>bc", "<cmd>bd<CR>", { desc = "Close Active Buffer" })
+      vim.keymap.set("n", "<leader>bco", "<cmd>BufferLineCloseOthers<CR>", { desc = "Close Other Buffers" })
+      for i = 1, 9 do
+        vim.keymap.set("n", "<leader>" .. i, function()
+          require("bufferline").go_to(i, true)
+        end, { desc = "Go to Buffer Tab " .. i })
+      end
     end,
   },
 
-  -- Zen mode
+  -- Zen mode (restores foldcolumn = "0" to match nvim-ufo and binds <leader>z)
   {
     "folke/zen-mode.nvim",
+    cmd = "ZenMode",
+    keys = {
+      { "<leader>z", "<cmd>ZenMode<CR>", desc = "Toggle Zen Mode" },
+    },
     opts = {
       on_open = function(_)
         vim.opt.nu = false
@@ -206,7 +224,7 @@ return {
         vim.opt.relativenumber = true
         pcall(function() require("noice").enable() end)
         pcall(vim.cmd, "UfoEnable")
-        vim.o.foldcolumn = "1"
+        vim.o.foldcolumn = "0"
         vim.o.foldenable = true
       end,
     },
@@ -215,6 +233,7 @@ return {
   -- Modern folding
   {
     "kevinhwang91/nvim-ufo",
+    event = { "BufReadPost", "BufNewFile" },
     dependencies = "kevinhwang91/promise-async",
     config = function()
       vim.o.foldcolumn = "0"
