@@ -19,7 +19,7 @@ This document provides a complete reference for all plugins configured in this m
 ### `nvim-lualine/lualine.nvim`
 - **Purpose**: Fast statusline with Tokyo Night theme.
 - **Features**: Integrates Git diffs, diagnostics, relative file path, recording macros / search mode indicators via Noice, and window progress/position.
-- **Extensions**: Enabled for `fugitive`, `quickfix`, `fzf`, `lazy`, `mason`, `nvim-dap-ui`, `oil`, `trouble`.
+- **Extensions**: Enabled for `fugitive`, `quickfix`, `fzf`, `lazy`, `mason`, `nvim-dap-ui`, `oil`.
 
 ### `akinsho/bufferline.nvim`
 - **Purpose**: Buffer tabline at the top of the screen showing open files.
@@ -105,7 +105,7 @@ This document provides a complete reference for all plugins configured in this m
 
 ### `mbbill/undotree`
 - **Purpose**: Visual undo history tree.
-- **Keymap**: `<leader>u` opens Telescope Undo; `<leader>U` toggles Undotree.
+- **Keymap**: `<leader>uu` opens Telescope Undo; `<leader>uU` / `<leader>U` toggles Undotree.
 
 ### `chentoast/marks.nvim` & `tummetott/unimpaired.nvim`
 - **Purpose**: Enhanced visual bookmarks in the gutter, and paired bracket navigation (`]q`/`[q` for quickfix, `]l`/`[l` for location list).
@@ -122,7 +122,7 @@ This document provides a complete reference for all plugins configured in this m
   - `<leader>fc`: Live grep code (excludes test and spec files).
   - `<leader>fb`: Switch active buffer.
   - `<leader>fo`: Open recent files.
-  - `<leader>fh`: Help documentation tags.
+  - `<leader>fH`: Help documentation tags.
   - `<leader>fs`: LSP document symbols.
   - `<leader>fw`: Search word under cursor across project.
   - `<leader>gc`: Search git commit history.
@@ -153,7 +153,7 @@ This document provides a complete reference for all plugins configured in this m
 
 ## 5. LSP & Autocompletion (`lua/plugins/lsp.lua`, `cmp.lua`)
 
-### `neovim/nvim-lspconfig` & `williamboman/mason.nvim`
+### `neovim/nvim-lspconfig` & `mason-org/mason.nvim`
 - **Purpose**: Modern Language Server Protocol setup without legacy wrappers.
 - **Lua Development**: `folke/lazydev.nvim` configures Lua LSP for Neovim config and plugins with full type hints.
 - **Preconfigured Servers**:
@@ -179,7 +179,7 @@ This document provides a complete reference for all plugins configured in this m
   - `K`: Hover documentation.
   - `<leader>ca`: Code action.
   - `<leader>rn`: Rename symbol.
-  - `<leader>d`: Show floating line diagnostic.
+  - `gl` / `<leader>cd`: Show floating line diagnostic.
   - `[d` / `]d`: Previous / next diagnostic.
   - `<C-h>` (insert mode): Signature help.
 
@@ -196,7 +196,7 @@ This document provides a complete reference for all plugins configured in this m
 
 ### `stevearc/conform.nvim`
 - **Purpose**: Fast asynchronous code formatting with LSP fallback.
-- **Keymap**: `<leader>l` formats the entire buffer or visual selection.
+- **Keymap**: `<leader>lf` formats the entire buffer or visual selection.
 - **Configured Formatters**:
   - C / C++: `clang-format`
   - Python: `isort`, `black`
@@ -238,7 +238,7 @@ This document provides a complete reference for all plugins configured in this m
 - **Commands**: `:DiffviewOpen`, `:DiffviewClose`, `:Neogit`.
 
 ### `pwntester/octo.nvim`
-- **Keymaps**: `<leader>O` opens Octo; `<leader>Op` lists GitHub PRs.
+- **Keymaps**: `<leader>Oo` opens Octo; `<leader>Op` lists GitHub PRs.
 
 ---
 
@@ -247,7 +247,7 @@ This document provides a complete reference for all plugins configured in this m
 ### `nvim-neotest/neotest`
 - **Adapters**: Go (`neotest-go`), Jest (`neotest-jest`), RSpec (`neotest-rspec`), Minitest, Elixir.
 - **Keymaps**:
-  - `<leader>t`: Run nearest test.
+  - `<leader>tr`: Run nearest test.
   - `<leader>tf`: Run current test file.
   - `<leader>td`: Run test directory.
   - `<leader>tp`: Toggle test output panel.
@@ -266,7 +266,7 @@ This document provides a complete reference for all plugins configured in this m
   - `<leader>dst`: Stop debugger.
   - `<leader>do`: Toggle DAP UI.
   - `<leader>dr`: Floating REPL.
-  - `<leader>ds`: Floating Scopes.
+  - `<leader>dsc`: Floating Scopes.
   - `<leader>df`: Floating Call Stack.
 
 ---
@@ -279,9 +279,9 @@ This document provides a complete reference for all plugins configured in this m
 - **Keymaps**:
   - `<leader>cl`: Listen for problems / contests parsed from browser.
   - `<leader>cr`: Save and run solution against all testcases in popup UI.
-  - `<leader>ca`: Add manual testcase.
-  - `<leader>ce`: Edit testcase.
-  - `<leader>cd`: Delete testcases.
+  - `<leader>cta`: Add manual testcase.
+  - `<leader>cte`: Edit testcase.
+  - `<leader>ctd`: Delete testcases.
   - `<leader>cs`: Auto-submit code to Codeforces via `cph-submit`.
   - `<leader>lc`: Listen for LeetCode problem via custom TCP listener.
   - `<leader>r`: QuickRun file against `input.txt`.
@@ -290,7 +290,7 @@ This document provides a complete reference for all plugins configured in this m
 
 ## 10. Notes & Documentation (`lua/plugins/markdown.lua`)
 
-### `epwalsh/obsidian.nvim`
+### `obsidian-nvim/obsidian.nvim`
 - **Vault Location**: `/home/Anirudh/Obsidian Vault`.
 - **Keymaps**:
   - `<leader>on`: Create new note.

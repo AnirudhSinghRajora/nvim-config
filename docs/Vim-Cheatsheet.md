@@ -148,7 +148,7 @@ This cheatsheet is the complete, definitive reference for every keybinding, navi
 | `"{reg}y` | Normal, Visual | Yank into specific register `{reg}` |
 | `"{reg}p` | Normal, Visual | Paste from specific register `{reg}` |
 | `"+` | Normal, Visual | System clipboard register (`<leader>y`, `<leader>p`) |
-| `"_` | Normal, Visual | Black hole register (`<leader>d` deletes without touching clipboard) |
+| `"_` | Normal, Visual | Black hole register (`<leader>D` deletes without touching clipboard) |
 | `"0` | Normal | Yank register (stores last explicit yank, untouched by `x` or `d`) |
 | `:reg` | Normal | View contents of all Neovim registers |
 
@@ -161,7 +161,7 @@ This cheatsheet is the complete, definitive reference for every keybinding, navi
 | `:wa` / `:qa` | Save all modified buffers / quit all windows |
 | `:%s/old/new/g` | Search and replace `old` with `new` across entire buffer |
 | `:%s/old/new/gc` | Search and replace with confirmation prompt for each occurrence |
-| `<leader>s` | Interactive search & replace for word currently under cursor |
+| `<leader>sr` | Interactive search & replace for word currently under cursor |
 | `//` | Visual | Search buffer for visually highlighted text |
 | `<Esc>` | Normal | **Clear search highlights & dismiss all active notifications/popups** |
 | `<leader>nd` | Normal | Dismiss active notifications |
@@ -274,7 +274,7 @@ This cheatsheet is the complete, definitive reference for every keybinding, navi
 | `zm` | Close fold level one step |
 | `za` | Toggle fold under cursor |
 | `zo` / `zc` | Open / close fold under cursor |
-| `K` | Hover: If cursor is on a closed fold, peeks fold preview in floating window |
+| `zK` | Peek Fold: If cursor is on a closed fold, peeks fold preview in floating window (falls back to Hover) |
 
 ### Focus & Zen Modes
 | Key | Description |
@@ -375,7 +375,7 @@ This cheatsheet is the complete, definitive reference for every keybinding, navi
 | `<leader>fc` | Live grep code only (excludes tests, specs, fixtures) |
 | `<leader>fb` | Find currently open buffers |
 | `<leader>fo` | Find recent / old files |
-| `<leader>fh` | Search Neovim help documentation |
+| `<leader>fH` | Search Neovim help documentation |
 | `<leader>fs` | Search LSP document symbols in current buffer |
 | `<leader>fw` | Find word currently under cursor across workspace |
 | `<leader>fk` | Search all registered keymaps |
@@ -430,7 +430,7 @@ This cheatsheet is the complete, definitive reference for every keybinding, navi
 | `<leader>rn` | Normal | Rename symbol workspace-wide |
 | `<leader>ca` | Normal, Visual | Show LSP code actions |
 | `<leader>ws` | Normal | Search workspace symbols |
-| `<leader>d` | Normal | Show line diagnostics float |
+| `gl` / `<leader>cd` | Normal | Show line diagnostics float |
 | `[d` | Normal | Jump to previous diagnostic error/warning |
 | `]d` | Normal | Jump to next diagnostic error/warning |
 | `<leader>vrr` | Normal | *(Legacy)* References |
@@ -443,7 +443,7 @@ This cheatsheet is the complete, definitive reference for every keybinding, navi
 
 | Key | Mode | Description |
 | :--- | :--- | :--- |
-| `<leader>lf` / `<leader>l` | Normal, Visual | Format buffer or selected range (**Conform.nvim**) |
+| `<leader>lf` | Normal, Visual | Format buffer or selected range (**Conform.nvim**) |
 | `<leader>ll` | Normal | Trigger manual linting pass (**nvim-lint**) |
 
 ---
@@ -472,7 +472,7 @@ This cheatsheet is the complete, definitive reference for every keybinding, navi
 | Key | Description |
 | :--- | :--- |
 | `<leader>gs` | Open Fugitive Git status panel (`:Git`) |
-| `<leader>O` | Open Octo GitHub dashboard |
+| `<leader>Oo` | Open Octo GitHub dashboard |
 | `<leader>Op` | List GitHub pull requests |
 | `:DiffviewOpen` | Open side-by-side branch / commit diff view |
 | `:DiffviewClose` | Close Diffview panels |
@@ -488,9 +488,9 @@ This cheatsheet is the complete, definitive reference for every keybinding, navi
 | :--- | :--- |
 | `<leader>cl` | Start listening for problems from **Competitive Companion** browser extension (port 27121) |
 | `<leader>cr` | Save current solution, compile C++, and run testcases with diffs |
-| `<leader>cta` / `<leader>ca` | Add manual testcase input & expected output |
-| `<leader>cte` / `<leader>ce` | Edit existing testcase |
-| `<leader>ctd` / `<leader>cd` | Delete testcases |
+| `<leader>cta` | Add manual testcase input & expected output |
+| `<leader>cte` | Edit existing testcase |
+| `<leader>ctd` | Delete testcases |
 | `<leader>cs` | Auto-submit C++ solution to **Codeforces** via `cph-submit` |
 | `<leader>lc` | Start custom **LeetCode** problem listener on port 27121 |
 
@@ -516,7 +516,7 @@ This cheatsheet is the complete, definitive reference for every keybinding, navi
 | `<leader>E` | Set exception breakpoint |
 | `<leader>do` | Toggle DAP UI layout |
 | `<leader>dr` | Open floating DAP REPL console |
-| `<leader>dsc` / `<leader>ds` | Open floating Scopes inspector |
+| `<leader>dsc` | Open floating Scopes inspector |
 | `<leader>df` | Open floating Call Stacks inspector |
 | `<leader>db` | Open floating Breakpoints manager |
 | `<leader>dl` | Re-run last debugging session |
@@ -527,7 +527,7 @@ This cheatsheet is the complete, definitive reference for every keybinding, navi
 
 | Key | Description |
 | :--- | :--- |
-| `<leader>t` / `<leader>tr` | Run nearest test under cursor |
+| `<leader>tr` | Run nearest test under cursor |
 | `<leader>tf` | Run entire test file |
 | `<leader>td` | Run tests in current working directory |
 | `<leader>tp` | Toggle floating test output panel |

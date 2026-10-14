@@ -13,6 +13,7 @@ A clean, modular, high-performance Neovim configuration built for general-purpos
 │   ├── core/
 │   │   ├── globals.lua       # Global helper utilities (e.g. P() inspect printer)
 │   │   ├── options.lua       # Single source of truth for all editor options
+│   │   ├── treesitter_compat.lua # Neovim 0.12+ Tree-sitter compatibility shim
 │   │   └── keymaps.lua       # Editor-native keymaps, window navigation, visual edits
 │   │
 │   ├── plugins/              # 100% modular plugin specifications (one domain per file)
@@ -38,7 +39,8 @@ A clean, modular, high-performance Neovim configuration built for general-purpos
 │
 ├── ftplugin/                 # Filetype-specific configurations
 │   ├── go.lua                # Go indentation and formatting options
-│   └── java.lua              # JDTLS configuration (Linux-compatible)
+│   ├── java.lua              # JDTLS configuration (cross-platform)
+│   └── lua.lua               # Lua 2-space indentation matching .stylua.toml
 └── templates/
     └── cp.cpp                # Competitive programming starter template
 ```
@@ -101,8 +103,8 @@ Leader is set to `<Space>`.
 - `<A-S-Down>` / `<A-S-Up>` : Duplicate current line down / up
 - `J` / `K` (visual mode) : Move selected block down / up
 - `<` / `>` (visual mode) : Indent / unindent staying in visual mode
-- `<leader>s` : Search & replace word under cursor across buffer
-- `<leader>l` : Format buffer or visual selection (Conform)
+- `<leader>sr` : Search & replace word under cursor across buffer
+- `<leader>lf` : Format buffer or visual selection (Conform)
 - `<leader>ll` : Trigger linter (nvim-lint)
 
 ### LSP (Language Server Protocol)
@@ -112,7 +114,7 @@ Leader is set to `<Space>`.
 - `K` : Hover documentation
 - `<leader>ca` : Code action
 - `<leader>rn` : Rename symbol
-- `<leader>d` : Show floating line diagnostic
+- `gl` / `<leader>cd` : Show floating line diagnostic
 - `[d` / `]d` : Previous / next diagnostic
 - `<C-h>` (insert mode) : Signature help
 
@@ -125,14 +127,14 @@ Leader is set to `<Space>`.
 - `<leader>hb` : Blame line
 - `<leader>htb` : Toggle live git blame
 - `<leader>hd` : Diff this file
-- `<leader>O` : Octo (GitHub issues / PRs)
+- `<leader>Oo` : Octo (GitHub issues / PRs)
 
 ### Competitive Programming
 - `<leader>cl` : Listen for problems via Competitive Companion browser extension
 - `<leader>cr` : Save & run all testcases with CompetiTest
-- `<leader>cta` / `<leader>ca` : Add testcase manually
-- `<leader>ce` : Edit testcase
-- `<leader>cd` : Delete testcases
+- `<leader>cta` : Add testcase manually
+- `<leader>cte` : Edit testcase
+- `<leader>ctd` : Delete testcases
 - `<leader>cs` : Auto-submit to Codeforces via cph-submit extension
 - `<leader>lc` : Listen for LeetCode problem
 - `<leader>r` : QuickRun current file with `input.txt`
@@ -153,6 +155,8 @@ Leader is set to `<Space>`.
 - `<C-h>`, `<C-j>`, `<C-k>`, `<C-l>` : Seamless window & tmux split navigation
 - `<leader>ft` : Floating terminal (Floaterm)
 - `<leader>flt` : Toggle floating terminal
+- `<leader>fh` / `<leader>th` : Toggle bottom horizontal terminal
+- `<leader>fH` : Find help tags (Telescope)
 
 ---
 
