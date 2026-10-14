@@ -2,6 +2,8 @@ return {
   {
     "nvim-telescope/telescope.nvim",
     branch = "0.1.x",
+    event = "VimEnter",
+    cmd = "Telescope",
     dependencies = {
       "nvim-lua/plenary.nvim",
       { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
@@ -17,7 +19,7 @@ return {
       local actions = require("telescope.actions")
       local telescopeConfig = require("telescope.config")
 
-      -- Keymaps
+      -- Keymaps (<leader>fH for Help Tags so <leader>fh stays dedicated to Floaterm)
       vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find Files" })
       vim.keymap.set(
         "n",
@@ -28,11 +30,11 @@ return {
       vim.keymap.set(
         "n",
         "<leader>fc",
-        '<cmd>lua require("telescope.builtin").live_grep({ glob_pattern = "!{spec,test}"})<CR>',
+        '<cmd>lua require("telescope.builtin").live_grep({ glob_pattern = "!*{spec,test}*" })<CR>',
         { desc = "Live Grep Code" }
       )
       vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Find Buffers" })
-      vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Find Help Tags" })
+      vim.keymap.set("n", "<leader>fH", builtin.help_tags, { desc = "Find Help Tags" })
       vim.keymap.set("n", "<leader>fs", builtin.lsp_document_symbols, { desc = "Find Symbols" })
       vim.keymap.set("n", "<leader>fi", "<cmd>AdvancedGitSearch<CR>", { desc = "AdvancedGitSearch" })
       vim.keymap.set("n", "<leader>fo", builtin.oldfiles, { desc = "Find Old Files" })
@@ -78,8 +80,9 @@ return {
         if not vim.tbl_isempty(multi) then
           actions.close(prompt_bufnr)
           for _, j in pairs(multi) do
-            if j.path ~= nil then
-              vim.cmd(string.format("%s %s", "edit", j.path))
+            local path = j.path or j.filename
+            if path ~= nil then
+              vim.cmd("edit " .. vim.fn.fnameescape(path))
             end
           end
         else

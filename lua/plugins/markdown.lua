@@ -1,7 +1,7 @@
 return {
-  -- Obsidian integration
+  -- Obsidian integration (community-maintained fork with safe note_id_func fallback)
   {
-    "epwalsh/obsidian.nvim",
+    "obsidian-nvim/obsidian.nvim",
     version = "*",
     lazy = true,
     ft = "markdown",
@@ -38,7 +38,10 @@ return {
         },
         new_notes_location = "notes_subdir",
         note_id_func = function(title)
-          return title
+          if title ~= nil and title ~= "" then
+            return title
+          end
+          return tostring(os.time())
         end,
         note_frontmatter_func = function(note)
           local out = { id = note.id, aliases = note.aliases, tags = note.tags }
@@ -71,12 +74,12 @@ return {
     end,
   },
 
-  -- Markdown rendered in buffer
+  -- Markdown rendered in buffer (unified on nvim-web-devicons)
   {
     "MeanderingProgrammer/render-markdown.nvim",
     ft = { "markdown" },
     opts = {},
-    dependencies = { "nvim-treesitter/nvim-treesitter", "echasnovski/mini.icons" },
+    dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
   },
 
   -- Markdown browser preview

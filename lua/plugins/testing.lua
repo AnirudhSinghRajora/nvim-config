@@ -1,6 +1,7 @@
 return {
   {
     "nvim-neotest/neotest",
+    lazy = true,
     dependencies = {
       "nvim-lua/plenary.nvim",
       "nvim-treesitter/nvim-treesitter",
@@ -27,16 +28,13 @@ return {
         adapters = {
           require("neotest-rspec")({
             rspec_cmd = function()
-              return vim.iter({
-                "bundle",
-                "exec",
-                "rspec",
-              }):flatten():totable()
+              return { "bundle", "exec", "rspec" }
             end,
           }),
           neotest_jest,
           require("neotest-minitest"),
           require("neotest-elixir"),
+          require("neotest-gradle"),
           require("neotest-go"),
         },
         output_panel = {

@@ -12,7 +12,7 @@ return {
           cpp = { "clang-format" },
           python = { "isort", "black" },
           rust = { "rustfmt" },
-          go = { "gofmt", "goimports" },
+          go = { "goimports" },
           javascript = { "prettierd", "prettier", stop_after_first = true },
           typescript = { "prettierd", "prettier", stop_after_first = true },
           javascriptreact = { "prettierd", "prettier", stop_after_first = true },
@@ -39,7 +39,7 @@ return {
         },
       })
 
-      -- Format keymaps (<leader>lf and fallback <leader>l)
+      -- Format keymap (<leader>lf; removed bare <leader>l to eliminate 500ms prefix stall)
       local format_fn = function()
         conform.format({
           lsp_format = "fallback",
@@ -49,7 +49,6 @@ return {
       end
 
       vim.keymap.set({ "n", "v" }, "<leader>lf", format_fn, { desc = "Format file or range" })
-      vim.keymap.set({ "n", "v" }, "<leader>l", format_fn, { desc = "Format file or range" })
     end,
   },
 }

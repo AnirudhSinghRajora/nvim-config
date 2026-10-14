@@ -14,13 +14,13 @@ return {
             vim.keymap.set(mode, l, r, opts)
           end
 
-          -- Navigation
+          -- Navigation (modern nav_hunk API)
           map("n", "]c", function()
             if vim.wo.diff then
               return "]c"
             end
             vim.schedule(function()
-              gs.next_hunk()
+              gs.nav_hunk("next")
             end)
             return "<Ignore>"
           end, { expr = true, desc = "Next Git Hunk" })
@@ -30,7 +30,7 @@ return {
               return "[c"
             end
             vim.schedule(function()
-              gs.prev_hunk()
+              gs.nav_hunk("prev")
             end)
             return "<Ignore>"
           end, { expr = true, desc = "Prev Git Hunk" })
@@ -45,7 +45,7 @@ return {
             gs.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
           end, { desc = "Git: Reset Selected Hunk" })
           map("n", "<leader>hS", gs.stage_buffer, { desc = "Git: Stage Buffer" })
-          map("n", "<leader>hu", gs.undo_stage_hunk, { desc = "Git: Undo Stage Hunk" })
+          map("n", "<leader>hu", gs.stage_hunk, { desc = "Git: Undo Stage Hunk" })
           map("n", "<leader>hR", gs.reset_buffer, { desc = "Git: Reset Buffer" })
           map("n", "<leader>hp", gs.preview_hunk, { desc = "Git: Preview Hunk" })
           map("n", "<leader>hb", function()
@@ -56,7 +56,7 @@ return {
           map("n", "<leader>hD", function()
             gs.diffthis("~")
           end, { desc = "Git: Diff Against ~" })
-          map("n", "<leader>htd", gs.toggle_deleted, { desc = "Git: Toggle Deleted" })
+          map("n", "<leader>htd", gs.preview_hunk_inline, { desc = "Git: Preview Deleted / Inline Hunk" })
 
           -- Text object
           map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", { desc = "Git: Select Hunk" })
@@ -96,7 +96,7 @@ return {
     config = true,
   },
 
-  -- GitHub PR & Issue integration
+  -- GitHub PR & Issue integration (<leader>Oo avoids 500ms stall with <leader>Op)
   {
     "pwntester/octo.nvim",
     cmd = "Octo",
@@ -114,7 +114,7 @@ return {
       pcall(function() vim.treesitter.language.register("markdown", "octo") end)
     end,
     keys = {
-      { "<leader>O", "<cmd>Octo<cr>", desc = "Octo" },
+      { "<leader>Oo", "<cmd>Octo<cr>", desc = "Octo Dashboard" },
       { "<leader>Op", "<cmd>Octo pr list<cr>", desc = "Octo PR List" },
     },
   },
