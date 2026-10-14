@@ -5,7 +5,7 @@ return {
     ft = "lua",
     opts = {
       library = {
-        { path = "luvit-meta/library", words = { "vim%.uv" } },
+        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
       },
     },
   },
@@ -18,7 +18,7 @@ return {
 
   -- Package manager for LSP servers, linters, and formatters
   {
-    "williamboman/mason.nvim",
+    "mason-org/mason.nvim",
     cmd = "Mason",
     build = ":MasonUpdate",
     opts = {
@@ -35,7 +35,8 @@ return {
   -- Mason Tool Installer for linters, formatters, and debug adapters
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
-    dependencies = { "williamboman/mason.nvim" },
+    event = "VeryLazy",
+    dependencies = { "mason-org/mason.nvim" },
     opts = {
       ensure_installed = {
         -- Formatters & Linters
@@ -50,6 +51,7 @@ return {
         "shellcheck",
         "beautysh",
         "google-java-format",
+        "jdtls",
         "ktlint",
         "standardrb",
         "htmlbeautifier",
@@ -68,8 +70,8 @@ return {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
-      "williamboman/mason.nvim",
-      "williamboman/mason-lspconfig.nvim",
+      "mason-org/mason.nvim",
+      "mason-org/mason-lspconfig.nvim",
       "hrsh7th/cmp-nvim-lsp",
     },
     config = function()
@@ -109,9 +111,24 @@ return {
           map("<leader>rn", vim.lsp.buf.rename, "Rename Symbol")
           map("<leader>ca", vim.lsp.buf.code_action, "Code Action", { "n", "v" })
           map("<leader>ws", vim.lsp.buf.workspace_symbol, "Workspace Symbols")
-          map("<leader>d", vim.diagnostic.open_float, "Show Diagnostic")
-          map("[d", vim.diagnostic.goto_prev, "Previous Diagnostic")
-          map("]d", vim.diagnostic.goto_next, "Next Diagnostic")
+          map("gl", vim.diagnostic.open_float, "Show Line Diagnostic")
+          map("<leader>cd", vim.diagnostic.open_float, "Show Line Diagnostic")
+
+          map("[d", function()
+            if vim.diagnostic.jump then
+              vim.diagnostic.jump({ count = -1, float = true })
+            else
+              vim.diagnostic.goto_prev()
+            end
+          end, "Previous Diagnostic")
+
+          map("]d", function()
+            if vim.diagnostic.jump then
+              vim.diagnostic.jump({ count = 1, float = true })
+            else
+              vim.diagnostic.goto_next()
+            end
+          end, "Next Diagnostic")
 
           -- Keep backward compatibility with exosyphon legacy keys
           map("<leader>vrr", vim.lsp.buf.references, "Goto References")
@@ -134,8 +151,6 @@ return {
         dynamicRegistration = false,
         lineFoldingOnly = true,
       }
-
-      local lspconfig = require("lspconfig")
 
       -- Specific server configurations
       local servers = {
@@ -227,19 +242,31 @@ return {
         terraformls = {},
       }
 
+      -- Native Neovim 0.11+ vim.lsp.config registration (with fallback for 0.10)
+      if vim.lsp.config then
+        vim.lsp.config("*", { capabilities = capabilities })
+        for server_name, server_opts in pairs(servers) do
+          server_opts.capabilities = vim.tbl_deep_extend("force", capabilities, server_opts.capabilities or {})
+          vim.lsp.config(server_name, server_opts)
+        end
+      end
+
       require("mason-lspconfig").setup({
         ensure_installed = vim.tbl_keys(servers),
-        handlers = {
+        automatic_enable = {
+          exclude = { "jdtls" }, -- Configured via ftplugin/java.lua
+        },
+        handlers = not vim.lsp.config and {
           function(server_name)
-            -- Only setup servers explicitly declared in our configuration
             if not servers[server_name] then
               return
             end
+            local lspconfig = require("lspconfig")
             local server_opts = servers[server_name] or {}
             server_opts.capabilities = vim.tbl_deep_extend("force", capabilities, server_opts.capabilities or {})
             lspconfig[server_name].setup(server_opts)
           end,
-        },
+        } or nil,
       })
     end,
   },

@@ -10,6 +10,7 @@ return {
       "L3MON4D3/LuaSnip",
       "saadparwaiz1/cmp_luasnip",
       "rafamadriz/friendly-snippets",
+      "windwp/nvim-autopairs",
     },
     config = function()
       local cmp = require("cmp")
@@ -32,6 +33,7 @@ return {
           end,
         },
         sources = cmp.config.sources({
+          { name = "lazydev", group_index = 0 },
           { name = "nvim_lsp" },
           { name = "luasnip", keyword_length = 2 },
           { name = "path" },
@@ -42,22 +44,10 @@ return {
           ["<C-p>"] = cmp.mapping.select_prev_item(cmp_select),
           ["<C-n>"] = cmp.mapping.select_next_item(cmp_select),
           ["<C-y>"] = cmp.mapping.confirm({ select = true }),
-          ["<CR>"] = cmp.mapping.confirm({ select = true }),
+          ["<CR>"] = cmp.mapping.confirm({ select = false }),
           ["<C-Space>"] = cmp.mapping.complete(),
-          ["<C-f>"] = cmp.mapping(function(fallback)
-            if luasnip.jumpable(1) then
-              luasnip.jump(1)
-            else
-              fallback()
-            end
-          end, { "i", "s" }),
-          ["<C-b>"] = cmp.mapping(function(fallback)
-            if luasnip.jumpable(-1) then
-              luasnip.jump(-1)
-            else
-              fallback()
-            end
-          end, { "i", "s" }),
+          ["<C-b>"] = cmp.mapping.scroll_docs(-4),
+          ["<C-f>"] = cmp.mapping.scroll_docs(4),
           ["<Tab>"] = cmp.mapping(function(fallback)
             if cmp.visible() then
               cmp.select_next_item()
@@ -78,6 +68,12 @@ return {
           end, { "i", "s" }),
         }),
       })
+
+      -- Hook nvim-autopairs into completion confirmation
+      local ap_ok, cmp_autopairs = pcall(require, "nvim-autopairs.completion.cmp")
+      if ap_ok then
+        cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
+      end
 
       -- `/` cmdline setup
       cmp.setup.cmdline("/", {
