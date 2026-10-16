@@ -110,6 +110,12 @@ return {
           local pos = current_node.mark:pos_begin()
           vim.api.nvim_win_set_cursor(0, { pos[1] + 1, pos[2] })
         end
+
+        -- Unlink the template session immediately so Tab never jumps out to the end of file
+        pcall(function()
+          ls.unlink_current()
+        end)
+
         vim.cmd("startinsert")
       end
 
